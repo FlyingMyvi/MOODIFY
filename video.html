@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#09090c" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>MOODIFY — Music Video Theater</title>
 
@@ -12,19 +13,20 @@
 
   <style>
     :root {
-      --bg-base: #0b0d14;
-      --bg-surface: #121622;
-      --bg-elevated: #1a2033;
-      --border: rgba(255, 255, 255, 0.08);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --accent: #ff4d6d;
-      --accent-glow: rgba(255, 77, 109, 0.28);
+      --bg-base: #09090c;
+      --bg-surface: #111116;
+      --bg-elevated: #191920;
+      --border: rgba(255, 255, 255, 0.12);
+      --text-primary: #f5f3ee;
+      --text-secondary: #aaa9b2;
+      --accent: #ccccff;
+      --accent-glow: rgba(204, 204, 255, 0.24);
 
-      --mood-love: #ff4d6d;
-      --mood-sad: #38bdf8;
-      --mood-energetic: #a855f7;
-      --mood-chill: #10b981;
+      --mood-love: #f5f3ee;
+      --mood-sad: #b8c4e6;
+      --mood-energetic: #ccccff;
+      --mood-chill: #c7d2dd;
+      --mood-custom: #aaa9b2;
     }
 
     * {
@@ -40,8 +42,8 @@
       min-height: 100vh;
       overflow-x: hidden;
       background-image:
-        radial-gradient(circle at 15% 10%, rgba(168, 85, 247, 0.08), transparent 35%),
-        radial-gradient(circle at 85% 85%, rgba(255, 77, 109, 0.07), transparent 40%);
+        radial-gradient(circle at 15% 10%, rgba(204, 204, 255, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 85%, rgba(204, 204, 255, 0.05), transparent 40%);
     }
 
     /* Header */
@@ -54,7 +56,7 @@
       justify-content: space-between;
       gap: 1rem;
       padding: 1rem 2rem;
-      background: rgba(11, 13, 20, 0.85);
+      background: rgba(9, 9, 12, 0.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
@@ -109,7 +111,7 @@
 
     .btn-primary {
       background: var(--accent);
-      color: #fff;
+      color: #09090c;
       border: none;
       padding: 0.65rem 1.2rem;
       border-radius: 999px;
@@ -257,9 +259,9 @@
     }
 
     .icon-btn.liked {
-      color: #ff4d6d;
-      border-color: rgba(255, 77, 109, 0.45);
-      background: rgba(255, 77, 109, 0.12);
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(204, 204, 255, 0.10);
     }
 
     /* Queue Sidebar */
@@ -320,7 +322,7 @@
     .chip.active,
     .chip:hover {
       background: var(--accent);
-      color: #fff;
+      color: #09090c;
       border-color: var(--accent);
     }
 
@@ -432,9 +434,9 @@
     }
 
     .remove-btn:hover {
-      background: rgba(239, 68, 68, 0.16);
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(255, 157, 157, 0.14);
+      color: #ff9d9d;
+      border-color: rgba(255, 157, 157, 0.4);
       transform: scale(1.06);
     }
 
@@ -557,11 +559,11 @@
 
   <script>
     const MOOD_COLORS = {
-      Love: '#ff4d6d',
-      Sad: '#38bdf8',
-      Energetic: '#a855f7',
-      Chill: '#10b981',
-      Custom: '#94a3b8'
+      Love: '#f5f3ee',
+      Sad: '#b8c4e6',
+      Energetic: '#ccccff',
+      Chill: '#c7d2dd',
+      Custom: '#aaa9b2'
     };
 
     const defaultVideos = [
@@ -664,7 +666,7 @@
     }
 
     function applyMoodTheme(mood) {
-      const color = MOOD_COLORS[mood] || '#ff4d6d';
+      const color = MOOD_COLORS[mood] || '#ccccff';
 
       document.documentElement.style.setProperty('--accent', color);
 
@@ -789,7 +791,7 @@
           `queue-item ${idx === currentIndex ? 'active' : ''}`;
 
         const dotColor =
-          MOOD_COLORS[video.mood] || '#ff4d6d';
+          MOOD_COLORS[video.mood] || '#ccccff';
 
         item.innerHTML = `
           <div class="thumb-box">
