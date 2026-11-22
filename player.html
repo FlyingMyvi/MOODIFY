@@ -1073,6 +1073,26 @@
       document.getElementById('playPauseBtn').textContent = '▶';
     });
 
+    async function syncTrackExistence() {
+      if (window.location.protocol === 'file:') return false;
+
+      let changed = false;
+      await Promise.all(tracks.map(async (track) => {
+        const previous = track.exists;
+        try {
+          const response = await fetch(encodeURI(track.file), {
+            method: 'HEAD',
+            cache: 'no-store'
+          });
+          track.exists = response.ok;
+        } catch (err) {
+          track.exists = false;
+        }
+        if (track.exists !== previous) changed = true;
+      }));
+      return changed;
+    }
+
     function initApp() {
       renderSidebarLibrary();
       renderGenreCards(activeGenre);
@@ -1083,6 +1103,14 @@
       if (window.location.hash === '#lyrics') {
         window.switchMainView('lyrics');
       }
+
+      syncTrackExistence().then((changed) => {
+        if (!changed) return;
+        renderSidebarLibrary();
+        renderGenreCards(activeGenre);
+        updateGeniusSection();
+        updateAppleQueue();
+      });
     }
 
     function loadTrackSource(id, autoPlay = true) {
