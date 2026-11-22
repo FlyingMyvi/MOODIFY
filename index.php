@@ -396,6 +396,26 @@ unset($track);
       justify-content: center;
       font-size: 18px;
       border: 1px solid rgba(204, 204, 255, 0.3);
+      background-color: var(--bg-elevated);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .lib-thumb.genre-pop {
+      background-image: url("https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=240&q=80");
+    }
+
+    .lib-thumb.genre-kpop {
+      background-image: url("https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=240&q=80");
+    }
+
+    .lib-thumb.genre-rnb {
+      background-image: url("https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=240&q=80");
+    }
+
+    .lib-thumb.genre-hiphop {
+      background-image: url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=240&q=80");
     }
 
     .lib-info h4 { font-size: 13px; font-weight: 700; }
@@ -972,10 +992,10 @@ unset($track);
     }
 
     const genres = [
-      { name: "Pop", desc: "Futuristic synth & vocal hits", emoji: "✨", color: "linear-gradient(135deg, #1b1b2f, #CCCCFF)" },
-      { name: "K-Pop", desc: "Seoul stadium anthems", emoji: "💜", color: "linear-gradient(135deg, #16162b, #CCCCFF)" },
-      { name: "R&B", desc: "Smooth midnight neo-soul", emoji: "🌙", color: "linear-gradient(135deg, #10101c, #9e9ee6)" },
-      { name: "Hip-Hop", desc: "Heavy 808s & lyrical flow", emoji: "🔥", color: "linear-gradient(135deg, #11111c, #a8a8f0)" }
+      { name: "Pop", desc: "Futuristic synth & vocal hits", imageClass: "genre-pop" },
+      { name: "K-Pop", desc: "Seoul stadium anthems", imageClass: "genre-kpop" },
+      { name: "R&B", desc: "Smooth midnight neo-soul", imageClass: "genre-rnb" },
+      { name: "Hip-Hop", desc: "Heavy 808s & lyrical flow", imageClass: "genre-hiphop" }
     ];
 
     let activeGenre = "Pop";
@@ -1141,7 +1161,7 @@ unset($track);
       const container = document.getElementById("sidebarLibrary");
       container.innerHTML = genres.map(g => `
         <div class="lib-item ${g.name === activeGenre ? 'selected' : ''}" onclick="window.setGenreFilter('${g.name}')">
-          <div class="lib-thumb" style="background: ${g.color}">${g.emoji}</div>
+          <div class="lib-thumb ${g.imageClass}" aria-hidden="true"></div>
           <div class="lib-info">
             <h4>${g.name} Mix</h4>
             <p>${g.desc}</p>
