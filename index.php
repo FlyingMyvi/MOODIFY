@@ -636,6 +636,11 @@ unset($track);
     .lyrics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
     .lyric-line { font-size: 20px; font-weight: 800; color: rgba(255, 255, 255, 0.35); margin-bottom: 14px; transition: all 0.3s ease; cursor: pointer; }
     .lyric-line.current { color: var(--accent-pop); transform: scale(1.02); text-shadow: 0 0 18px rgba(204, 204, 255, 0.45); }
+    .lyrics-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .lyric-offset { display: flex; align-items: center; gap: 6px; }
+    .lyric-offset .pill { padding: 5px 10px; font-size: 11px; }
+    .lyric-offset button:disabled { opacity: .4; cursor: not-allowed; }
+    #lyricOffsetLabel { font-size: 11px; color: var(--text-secondary); min-width: 72px; text-align: center; }
 
     /* ================= RIGHT QUEUE PANEL ================= */
     .apple-queue-panel {
@@ -793,7 +798,14 @@ unset($track);
           <span class="hero-tag">SPOTIFY REAL-TIME LYRICS</span>
           <h2 id="lyricsSongTitle" style="font-size: 22px; margin-top: 6px;">Loading...</h2>
         </div>
-        <button class="pill active" onclick="window.switchMainView('home')">← Back to Home</button>
+        <div class="lyrics-header-actions">
+          <div class="lyric-offset">
+            <button type="button" class="pill" onclick="window.adjustLyricOffset(-0.5)" title="Show lyrics later">-0.5s</button>
+            <span id="lyricOffsetLabel">Sync 0.0s</span>
+            <button type="button" class="pill" onclick="window.adjustLyricOffset(0.5)" title="Show lyrics earlier">+0.5s</button>
+          </div>
+          <button class="pill active" onclick="window.switchMainView('home')">← Back to Home</button>
+        </div>
       </div>
       <div id="lyricsLinesBox"></div>
     </div>
@@ -856,6 +868,8 @@ unset($track);
   <!-- ELEMEN AUDIO HTML5 SEBENAR -->
   <audio id="realAudioPlayer" preload="metadata"></audio>
 
+  <script src="lyrics-timed.js?v=2"></script>
+
   <script type="module">
     // Cuba import lyrics.js kalau wujud, kalau ada ralat sintaks dalam lyrics.js dia guna fallback supaya player tak rosak
     let songLyricsDatabase = {};
@@ -880,6 +894,15 @@ unset($track);
     let currentTrackIndex = 0;
     let isPlaying = false;
 
+    // Synced lyrics state
+    let currentTimedLyrics = null;
+    let currentTimedMode = false;
+    let lyricOffset = 0;
+    let activeTimedIndex = -1;
+    const LYRIC_OFFSET_KEY = 'moodify_php_lyric_offsets';
+    let lyricOffsets = JSON.parse(localStorage.getItem(LYRIC_OFFSET_KEY) || '{}');
+    const timedKeyByTrack = { 0: 0, 1: 1, 3: 2, 5: 8, 6: 5, 7: 6, 8: 7, 9: 3, 10: 4 };
+
     const audio = document.getElementById('realAudioPlayer');
     audio.volume = 0.7;
 
@@ -899,7 +922,8 @@ unset($track);
     audio.addEventListener('timeupdate', () => {
       document.getElementById('progressBar').value = Math.floor(audio.currentTime);
       document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
-      renderLiveLyrics();
+      if (currentTimedMode) updateTimedHighlight();
+      else renderLiveLyrics();
     });
 
     audio.addEventListener('ended', () => {
@@ -1121,18 +1145,85 @@ unset($track);
       }
     };
 
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function updateLyricOffsetLabel() {
+      const label = document.getElementById('lyricOffsetLabel');
+      if (!label) return;
+      label.textContent = currentTimedMode
+        ? 'Sync ' + (lyricOffset > 0 ? '+' : '') + lyricOffset.toFixed(1) + 's'
+        : 'No sync data';
+      document.querySelectorAll('.lyric-offset button').forEach(b => { b.disabled = !currentTimedMode; });
+    }
+
+    function updateTimedHighlight() {
+      if (!currentTimedMode || !currentTimedLyrics || !currentTimedLyrics.length) return;
+      const t = audio.currentTime + lyricOffset;
+      let idx = 0;
+      for (let k = 0; k < currentTimedLyrics.length; k++) {
+        if (currentTimedLyrics[k].t <= t) idx = k;
+        else break;
+      }
+      if (idx === activeTimedIndex) return;
+
+      const lines = document.querySelectorAll('#lyricsLinesBox .lyric-line');
+      if (activeTimedIndex >= 0 && lines[activeTimedIndex]) lines[activeTimedIndex].classList.remove('current');
+      activeTimedIndex = idx;
+      if (lines[idx]) {
+        lines[idx].classList.add('current');
+        lines[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    window.adjustLyricOffset = function(delta) {
+      if (!currentTimedMode) return;
+      lyricOffset = Math.max(-10, Math.min(10, Math.round((lyricOffset + delta) * 10) / 10));
+      lyricOffsets[currentTrackIndex] = lyricOffset;
+      localStorage.setItem(LYRIC_OFFSET_KEY, JSON.stringify(lyricOffsets));
+      updateLyricOffsetLabel();
+      updateTimedHighlight();
+    };
+
     function renderLiveLyrics() {
       const t = tracks[currentTrackIndex];
-      const songData = songLyricsDatabase[currentTrackIndex];
       document.getElementById('lyricsSongTitle').textContent = `${t.title} — ${t.artist}`;
       const box = document.getElementById('lyricsLinesBox');
 
-      if (!songData || !songData.lines) {
-        box.innerHTML = `<div class="lyric-line current">Lirik sedang dimuatkan atau sila semak fail lyrics.js...</div>`;
+      currentTimedLyrics = null;
+      currentTimedMode = false;
+      activeTimedIndex = -1;
+
+      const timedKey = timedKeyByTrack[currentTrackIndex];
+      const timed = (timedKey !== undefined && window.timedLyrics) ? window.timedLyrics[timedKey] : null;
+
+      if (timed && Array.isArray(timed.lines) && timed.lines.length) {
+        currentTimedMode = true;
+        currentTimedLyrics = timed.lines;
+        lyricOffset = Number(lyricOffsets[currentTrackIndex] || 0);
+        updateLyricOffsetLabel();
+
+        box.innerHTML = currentTimedLyrics.map((line, idx) => `
+          <div class="lyric-line" id="php-line-${idx}" data-time="${line.t}" onclick="window.jumpToLyric(${idx}, ${currentTimedLyrics.length})">
+            ${escapeHtml(line.text)}
+          </div>
+        `).join('');
+
+        updateTimedHighlight();
         return;
       }
 
-      // Pecahkan lirik ikut baris baru (\n) supaya highlight bergerak lancar
+      // Fallback: older plain lyrics without timestamps
+      const songData = songLyricsDatabase[currentTrackIndex];
+      lyricOffset = 0;
+      updateLyricOffsetLabel();
+
+      if (!songData || !songData.lines) {
+        box.innerHTML = `<div class="lyric-line current">Lyrics not available for this song.</div>`;
+        return;
+      }
+
       let linesArray = [];
       songData.lines.forEach(item => {
         linesArray.push(...item.split('\n').filter(l => l.trim() !== ''));
@@ -1144,13 +1235,20 @@ unset($track);
 
       box.innerHTML = linesArray.map((line, idx) => `
         <div class="lyric-line ${idx === activeLineIdx ? 'current' : ''}" onclick="window.jumpToLyric(${idx}, ${linesArray.length})">
-          ${line}
+          ${escapeHtml(line)}
         </div>
       `).join('');
     }
 
     window.jumpToLyric = function(idx, totalLines) {
       if (!audio.duration) return;
+
+      if (currentTimedMode && currentTimedLyrics && currentTimedLyrics[idx]) {
+        audio.currentTime = Math.max(0, currentTimedLyrics[idx].t - lyricOffset);
+        updateTimedHighlight();
+        return;
+      }
+
       audio.currentTime = (idx / totalLines) * audio.duration;
       renderLiveLyrics();
     };

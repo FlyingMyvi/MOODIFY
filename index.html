@@ -3,632 +3,1385 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOODIFY</title>
-<script src="lyrics.js"></script>
-<script src="lyrics-timed.js?v=2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<title>MOODIFY - Music Beyond Boundaries</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--black:#121110;--dark:#1C1A17;--cream:#F5F1E8;--beige:#E8DFD0;--leopard:#C4B49A;--brown:#8A7A64;--line:#E2D9C6}
-body{background:var(--black);color:#fff;font-family:'Inter Tight',sans-serif;overflow-x:hidden}
-body.playing header{top:72px}
-a{text-decoration:none;color:inherit}
-
-/* ===== DYNAMIC ISLAND - MINI PLAYER ATAS TENGAH ===== */
-#miniPlayer{
-position:fixed;top:8px;left:50%;transform:translateX(-50%) scale(.9);z-index:300;
-width:340px;max-width:calc(100% - 24px);
-background:#000;border:1px solid #33302A;border-radius:999px;
-display:none;align-items:center;gap:10px;padding:6px 6px 6px 8px;
-box-shadow:0 10px 30px rgba(0,0,0,.7);cursor:pointer;
-transition:.3s;
+:root {
+    --black: #09090c;
+    --panel: #111116;
+    --surface: #191920;
+    --lavender: #ccccff;
+    --white: #f5f3ee;
+    --grey: #aaa9b2;
+    --border: rgba(255,255,255,0.12);
 }
-#miniPlayer.show{display:flex;transform:translateX(-50%) scale(1);animation:pop .35s ease}
-@keyframes pop{0%{transform:translateX(-50%) scale(.7);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
-#miniPlayer img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #C4B49A;flex-shrink:0}
-#miniPlayer .mini-info{flex:1;min-width:0;text-align:left}
-#miniPlayer .mini-info b{font-family:'Archivo',sans-serif;font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#miniPlayer .mini-info span{font-size:11px;color:#999;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#miniPlayer .mini-btn{width:36px;height:36px;border-radius:50%;border:0;background:#F5F1E8;color:#000;font-size:14px;cursor:pointer;flex-shrink:0;font-weight:900}
-#miniPlayer .mini-next{width:32px;height:32px;border-radius:50%;border:1px solid #444;background:transparent;color:#fff;font-size:12px;cursor:pointer;flex-shrink:0}
-#miniPlayer .mini-progress{position:absolute;left:20px;right:20px;bottom:3px;height:2px;background:#333;border-radius:999px;overflow:hidden}
-#miniPlayer .mini-progress-bar{height:100%;background:#C4B49A;width:0%}
-#miniPlayer .eq{display:flex;gap:2px;align-items:end;height:14px;flex-shrink:0}
-#miniPlayer .eq span{width:3px;background:#C4B49A;border-radius:2px;animation:eq 0.8s ease-in-out infinite}
-#miniPlayer .eq span:nth-child(2){animation-delay:.2s}
-#miniPlayer .eq span:nth-child(3){animation-delay:.4s}
-@keyframes eq{0%,100%{height:4px}50%{height:14px}}
-#miniPlayer.paused .eq span{animation-play-state:paused;height:4px}
 
-/* LEOPARD TEXTURE */
-.leopard-texture{
-background-color:#E8DFD0;
-background-image:
-radial-gradient(ellipse 18px 13px at 12% 22%, rgba(60,50,38,.22) 0 45%, transparent 46%),
-radial-gradient(ellipse 10px 8px at 18% 16%, rgba(60,50,38,.18) 0 45%, transparent 46%),
-radial-gradient(ellipse 16px 12px at 68% 18%, rgba(60,50,38,.20) 0 45%, transparent 46%),
-radial-gradient(ellipse 9px 7px at 76% 24%, rgba(60,50,38,.15) 0 45%, transparent 46%),
-radial-gradient(ellipse 20px 14px at 42% 52%, rgba(60,50,38,.22) 0 45%, transparent 46%),
-radial-gradient(ellipse 11px 8px at 52% 46%, rgba(60,50,38,.16) 0 45%, transparent 46%),
-radial-gradient(ellipse 17px 12px at 14% 72%, rgba(60,50,38,.20) 0 45%, transparent 46%),
-radial-gradient(ellipse 10px 8px at 88% 68%, rgba(60,50,38,.16) 0 45%, transparent 46%),
-radial-gradient(ellipse 19px 13px at 62% 84%, rgba(60,50,38,.20) 0 45%, transparent 46%),
-radial-gradient(ellipse 10px 8px at 32% 88%, rgba(60,50,38,.15) 0 45%, transparent 46%);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
 }
-.leopard-line{height:6px;background-color:#E8DFD0;background-image:radial-gradient(ellipse 10px 7px at 15% 50%, rgba(60,50,38,.25) 0 45%, transparent 46%),radial-gradient(ellipse 8px 6px at 45% 50%, rgba(60,50,38,.2) 0 45%, transparent 46%),radial-gradient(ellipse 11px 7px at 75% 50%, rgba(60,50,38,.22) 0 45%, transparent 46%);border-top:1px solid #D8CDB8;border-bottom:1px solid #D8CDB8}
 
-/* HEADER */
-header{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:1280px;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:14px;background:#1C1A17;border:1px solid #33302A;transition:top .3s}
-.logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:2px;line-height:1}.logo span{color:var(--leopard)}.logo small{display:block;font-family:'Inter Tight',sans-serif;font-size:9px;letter-spacing:4px;color:#999;font-weight:700}
-nav{display:flex;gap:4px;flex-wrap:wrap}
-nav button{background:transparent;border:0;color:#BBB;padding:9px 13px;border-radius:10px;font-weight:700;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12px;letter-spacing:.5px;text-transform:uppercase}
-nav button.active,nav button:hover{background:#F5F1E8;color:#000}
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+}
 
-.page{display:none;min-height:100vh}
-.page.active{display:block}
-.wrap{max-width:1280px;margin:auto;padding:100px 20px 40px}
-body.playing .wrap{padding-top:155px}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.container {
+    width: 88%;
+    max-width: 1250px;
+    margin: auto;
+}
+
+/* NAVIGATION */
+
+header {
+    background: rgba(9,9,12,0.96);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(15px);
+}
+
+nav {
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    white-space: nowrap;
+}
+
+.logo span,
+footer h2 span {
+    color: var(--lavender);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.nav-links a {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: var(--grey);
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--lavender);
+}
 
 /* HERO */
-.hero{position:relative;border-radius:20px;overflow:hidden;background:#1C1A17;border:1px solid #33302A;display:grid;grid-template-columns:1.15fr .85fr;min-height:480px}
-.hero-left{padding:44px 36px}
-.hero-left .badge{font-family:'Archivo',sans-serif;font-size:11px;letter-spacing:3px;font-weight:800;color:var(--leopard);border:1px solid #44403A;display:inline-block;padding:7px 12px;border-radius:999px}
-.hero-left h1{font-family:'Anton',sans-serif;font-size:76px;line-height:.92;letter-spacing:1px;margin:16px 0;text-transform:uppercase;color:#fff}
-.hero-left h1 .beat{color:#fff;-webkit-text-stroke:1.5px #fff;background:none;-webkit-text-fill-color:#fff}
-.hero-left h1 .beat2{color:transparent;-webkit-text-stroke:1.5px var(--leopard)}
-.hero-left p{color:#B8B2A5;font-size:16px;line-height:1.6;max-width:520px;font-weight:500}
-.hero-stats{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
-.hero-stats div{background:#121110;border:1px solid #33302A;padding:12px 16px;border-radius:12px}
-.hero-stats b{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;display:block}
-.hero-stats span{font-size:11px;color:#888;letter-spacing:1px;font-weight:700;text-transform:uppercase}
-.hero-btns{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
-.btn-dark{background:#F5F1E8;color:#000;padding:14px 22px;border-radius:12px;font-weight:800;border:0;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.5px}
-.btn-outline{background:transparent;color:#fff;padding:14px 22px;border-radius:12px;font-weight:800;border:1px solid #555;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px}
-.hero-right{position:relative;overflow:hidden}
-.hero-right img{width:100%;height:100%;object-fit:cover;min-height:320px}
-.hero-right::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#1C1A17 0%,transparent 28%)}
-.hero-right .caption{position:absolute;left:16px;bottom:16px;z-index:2;background:rgba(0,0,0,.65);padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;letter-spacing:1px}
 
-/* SECTIONS */
-.section-cream{background:var(--cream);color:#111;border-radius:20px;padding:30px;margin-top:20px}
-.section-black{background:#1C1A17;border:1px solid #33302A;border-radius:20px;padding:30px;margin-top:20px}
-.section-leopard{border-radius:20px;padding:30px;margin-top:20px;border:1px solid #D8CDB8;color:#111}
-.section-title{font-family:'Anton',sans-serif;font-size:36px;letter-spacing:1px;line-height:1;text-transform:uppercase}
-.section-title span{color:var(--brown)}
-.section-sub{color:#888;margin:8px 0 18px;font-size:14px;font-weight:500}
-.section-cream .section-sub,.section-leopard .section-sub{color:#6B6252}
+.hero {
+    min-height: 680px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 90% 45%, rgba(145,145,200,0.18), transparent 38%),
+        linear-gradient(120deg, #111116, #09090c 75%);
+    border-bottom: 1px solid var(--border);
+}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.card{background:#24211D;border:1px solid #33302A;border-radius:18px;overflow:hidden;cursor:pointer;position:relative;transition:.2s}
-.card:hover{transform:translateY(-4px);border-color:var(--leopard)}
-.section-cream .card,.section-leopard .card{background:#fff;border:1px solid #E2D9C6;box-shadow:0 4px 16px rgba(0,0,0,.05)}
-.card img{width:100%;height:175px;object-fit:cover}
-.card-body{padding:16px}.card-body h3{font-family:'Archivo',sans-serif;font-size:19px;font-weight:800;line-height:1.1}.card-body p{color:#A39E90;font-size:13px;margin:6px 0 12px;line-height:1.5}
-.section-cream .card-body p,.section-leopard .card-body p{color:#777}
-.play-mini{background:#111;color:#fff;border:0;padding:9px 16px;border-radius:10px;font-weight:800;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12px}
-.heart-btn{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:18px;cursor:pointer;z-index:5}
-.heart-btn.liked{background:#fff;color:#000}
-.rank-badge{position:absolute;top:12px;left:12px;background:#fff;color:#000;padding:6px 10px;border-radius:8px;font-weight:800;font-size:11px;letter-spacing:1px;font-family:'Archivo',sans-serif}
-.pos{font-family:'Anton',sans-serif;font-size:15px;background:#111;color:#F5F1E8;padding:4px 10px;border-radius:8px;letter-spacing:1px}
+.hero::after {
+    content: "";
+    position: absolute;
+    right: -150px;
+    top: 80px;
+    width: 470px;
+    height: 470px;
+    border: 1px solid rgba(204,204,255,0.15);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 45px rgba(204,204,255,0.025),
+        0 0 0 90px rgba(204,204,255,0.02);
+}
 
-.top3{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:12px;align-items:end;margin:16px 0}
-@media(max-width:900px){.top3{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-left h1{font-size:52px}}
-.top3-card{background:#111;border:1px solid #33302A;border-radius:16px;padding:14px;text-align:center;cursor:pointer}
-.top3-card img{width:100%;height:90px;object-fit:cover;border-radius:10px}
-.top3-card h4{font-family:'Archivo',sans-serif;font-size:16px;margin:8px 0 2px}.top3-card p{font-size:12px;color:#999}
-.top3-card.first{border-color:var(--leopard);background:#F5F1E8;color:#111}
-.top3-card.first p{color:#777}
-.top3-bar{height:6px;background:var(--leopard);border-radius:999px;margin-top:8px}
-.chart-box{background:#111;border:1px solid #33302A;border-radius:16px;padding:16px}
-.chart-row{display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer;padding:8px;border-radius:12px}
-.chart-row:hover{background:#222}
-.chart-row .num{font-family:'Anton',sans-serif;font-size:24px;width:40px;color:var(--leopard)}
-.chart-row img{width:54px;height:54px;border-radius:10px;object-fit:cover}
-.chart-row .info{flex:1}.chart-row .info b{font-family:'Archivo',sans-serif;font-size:16px}.chart-row .info p{font-size:12px;color:#999}
-.bar-wrap{flex:1.2;height:8px;background:#333;border-radius:999px;overflow:hidden;min-width:70px}
-.bar{height:100%;background:linear-gradient(90deg,#fff,#C4B49A);border-radius:999px}
-.pct{font-family:'Anton',sans-serif;font-size:16px;width:48px;text-align:right;color:#E8DFD0}
+.hero-content {
+    max-width: 850px;
+    padding: 100px 0;
+    position: relative;
+    z-index: 2;
+}
 
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:900px){.about-grid{grid-template-columns:1fr}}
-.about-card{background:#111;border:1px solid #33302A;border-radius:18px;padding:22px}
-.section-cream .about-card,.section-leopard .about-card{background:#fff;border:1px solid #E2D9C6}
-.about-card h3{font-family:'Archivo',sans-serif;font-size:22px;margin-bottom:8px}.about-card p{color:#aaa;line-height:1.6;font-size:14px}
-.section-cream .about-card p,.section-leopard .about-card p{color:#555}
-.member-mini{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.member-mini span{background:#111;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.hero-tag {
+    color: var(--lavender);
+    letter-spacing: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
 
-.two-col{display:grid;grid-template-columns:1fr 350px;gap:16px;align-items:start}
-@media(max-width:900px){.two-col{grid-template-columns:1fr}}
-.queue-box{background:#F5F1E8;color:#111;border-radius:20px;padding:16px;position:sticky;top:155px}
-.queue-box h3{font-family:'Anton',sans-serif;font-size:17px;letter-spacing:1px;margin-bottom:10px}
-.next-playing{background:#111;color:#fff;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;margin-bottom:12px}
-.next-playing img{width:52px;height:52px;border-radius:10px;object-fit:cover}
-.q-item{display:flex;gap:12px;align-items:center;padding:8px;border-radius:12px;cursor:pointer;color:#111}
-.q-item:hover,.q-item.active{background:#E8DFD0}
-.q-item img{width:46px;height:46px;border-radius:8px;object-fit:cover}.q-item b{font-family:'Archivo',sans-serif;font-size:14px}.q-item p{font-size:12px;color:#777}
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(55px, 8vw, 105px);
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -3px;
+    margin: 28px 0;
+}
 
-.player{background:#F5F1E8;color:#111;border-radius:20px;padding:20px}
-.player-top{display:flex;gap:14px;align-items:center}
-.player-top img{width:90px;height:90px;border-radius:14px;object-fit:cover}
-.player-top h2{font-family:'Archivo',sans-serif;font-size:26px;font-weight:800}.player-top p{font-family:'Archivo',sans-serif;font-size:12px;font-weight:800;color:#8A7A64;letter-spacing:1px}
-audio{width:100%;margin:12px 0}
-.lyrics-box{background:#111;border-radius:16px;padding:20px;max-height:430px;overflow:auto;margin-top:10px}
-.lyrics-box h3{color:#E8DFD0;font-size:12px;letter-spacing:3px;margin-bottom:10px;font-family:'Archivo',sans-serif}
-.lyrics-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.lyrics-head h3{margin-bottom:0}
-.lyric-offset{display:flex;align-items:center;gap:6px}
-.lyric-offset button{background:#1C1A17;color:#E8DFD0;border:1px solid #3A342C;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Archivo',sans-serif}
-.lyric-offset button:hover:not(:disabled){background:#E8DFD0;color:#111}
-.lyric-offset button:disabled{opacity:.4;cursor:not-allowed}
-#lyricOffsetLabel{font-size:10px;color:#8A7A64;min-width:76px;text-align:center;font-family:'Archivo',sans-serif}
-.lyric-line{font-family:'Inter Tight',sans-serif;font-size:21px;font-weight:700;line-height:1.4;color:#666;padding:5px 0;transition:.25s}
-.lyric-line.active{color:#fff;transform:translateX(4px)}
+.hero h1 span {
+    display: block;
+    color: var(--lavender);
+    font-style: italic;
+    font-weight: 500;
+}
 
-form{background:#F5F1E8;color:#111;padding:20px;border-radius:20px}
-label{display:block;margin:10px 0 4px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:800;letter-spacing:.5px}
-input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #DDD;background:#fff;color:#111;font-family:'Inter Tight',sans-serif;font-size:14px}
-.member{background:#24211D;border:1px solid #33302A;border-radius:18px;padding:16px;text-align:center}
-.member img{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--leopard)}
-.member h3{font-family:'Archivo',sans-serif}.member p{font-size:13px;color:#999}
-.reco-tag{background:#E8DFD0;color:#6B6252;border:1px solid #D8CDB8;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;display:inline-block;margin:3px 3px 0 0}
-footer{text-align:center;padding:26px;color:#888}
-footer a{color:#E8DFD0;margin:0 8px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:800}
+.hero p {
+    color: var(--grey);
+    max-width: 550px;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.main-btn {
+    display: inline-block;
+    padding: 13px 28px;
+    background: var(--lavender);
+    color: #111116;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    transition: 0.3s;
+}
+
+.main-btn:hover {
+    background: white;
+    transform: translateY(-3px);
+}
+
+.text-btn {
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    border-bottom: 1px solid var(--lavender);
+    padding-bottom: 5px;
+}
+
+/* GENERAL SECTIONS */
+
+section {
+    padding: 95px 0;
+}
+
+.section-heading {
+    margin-bottom: 38px;
+}
+
+.section-heading small {
+    color: var(--lavender);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.section-heading h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 43px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.section-heading p {
+    color: var(--grey);
+    font-size: 13px;
+}
+
+/* FEATURED GENRES - CINEMATIC IMAGE CARDS */
+
+.genre-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.genre-card {
+    min-height: 270px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border: 1px solid rgba(255,255,255,0.14);
+    background-color: #191920;
+    background-size: cover;
+    background-position: center;
+    transition: 0.4s ease;
+}
+
+.genre-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+        to top,
+        rgba(5,5,8,0.95) 0%,
+        rgba(5,5,8,0.55) 48%,
+        rgba(5,5,8,0.15) 100%
+    );
+    transition: 0.4s ease;
+}
+
+.genre-card:hover {
+    transform: translateY(-7px);
+    border-color: var(--lavender);
+}
+
+.genre-card:hover::before {
+    background: linear-gradient(
+        to top,
+        rgba(5,5,8,0.98),
+        rgba(5,5,8,0.45)
+    );
+}
+
+.genre-card:hover .genre-content {
+    transform: translateY(-5px);
+}
+
+.genre-content {
+    position: relative;
+    z-index: 2;
+    transition: 0.4s ease;
+}
+
+.genre-number {
+    display: block;
+    color: var(--lavender);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.genre-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px;
+    line-height: 1.3;
+    margin-bottom: 7px;
+    color: white;
+}
+
+.genre-card p {
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+}
+
+/* Individual genre backgrounds */
+
+.pop-card {
+    background-image: url("https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=85");
+}
+
+.kpop-card {
+    background-image: url("https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=85");
+}
+
+.rnb-card {
+    background-image: url("https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=85");
+}
+
+.hiphop-card {
+    background-image: url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=85");
+}
+
+/* OUR MUSIC TASTE */
+
+.songs-section {
+    background: #101015;
+}
+
+.search-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 14px 20px;
+    margin-bottom: 35px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: white;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.search-box:focus {
+    border-color: var(--lavender);
+}
+
+.genre-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 35px 0 15px;
+    scroll-margin-top: 120px;
+}
+
+.genre-heading h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 27px;
+}
+
+.genre-heading span {
+    color: var(--lavender);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.music-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.music-row {
+    display: grid;
+    grid-template-columns: 35px 55px minmax(0, 1fr) 85px;
+    align-items: center;
+    gap: 18px;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+    transition: 0.25s;
+}
+
+.music-row:hover {
+    background: var(--surface);
+}
+
+.song-number {
+    color: var(--grey);
+    font-size: 14px;
+    text-align: center;
+}
+
+.album-cover {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, #292940, #7777a8);
+    overflow: hidden;
+}
+
+.album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--lavender);
+    font-size: 22px;
+}
+
+.song-details h4 {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.song-details p {
+    font-size: 12px;
+    color: var(--grey);
+}
+
+.song-type {
+    color: var(--lavender);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-align: right;
+}
+
+/* ARTIST SPOTLIGHT */
+
+.artist-section {
+    background: var(--black);
+}
+
+.artist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.artist-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px;
+    transition: 0.3s;
+}
+
+.artist-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--lavender);
+}
+
+.artist-image {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    background: linear-gradient(135deg, #292940, #7777a8);
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.artist-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.artist-card small {
+    color: var(--lavender);
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.artist-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    margin-top: 5px;
+}
+
+/* TEAM */
+
+.team-section {
+    background: #101015;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+.team-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 25px 13px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.team-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--lavender);
+}
+
+.team-photo {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ccccff, #7777a8);
+    color: #111116;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.team-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.team-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    margin-bottom: 7px;
+}
+
+.team-card p {
+    color: var(--grey);
+    font-size: 11px;
+}
+
+/* FOOTER */
+
+footer {
+    background: #09090c;
+    padding: 45px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+footer h2 {
+    font-size: 22px;
+    letter-spacing: 5px;
+}
+
+footer p {
+    color: var(--grey);
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.footer-links a {
+    color: var(--grey);
+    font-size: 11px;
+}
+
+.footer-links a:hover {
+    color: var(--lavender);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    nav {
+        flex-direction: column;
+        padding: 20px 0;
+    }
+
+    .nav-links {
+        justify-content: center;
+    }
+
+    .genre-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .artist-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .hero {
+        min-height: 570px;
+    }
+
+    .hero h1 {
+        font-size: 55px;
+    }
+
+    .section-heading h2 {
+        font-size: 33px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 9px;
+    }
+
+    .music-row {
+        grid-template-columns: 22px 48px minmax(0, 1fr) 55px;
+        gap: 10px;
+        padding: 12px 5px;
+    }
+
+    .album-cover {
+        width: 48px;
+        height: 48px;
+    }
+
+    .song-details h4 {
+        font-size: 12px;
+    }
+
+    .song-details p {
+        font-size: 10px;
+    }
+
+    .song-type {
+        font-size: 9px;
+    }
+
+    .genre-grid {
+        gap: 10px;
+    }
+
+    .genre-card {
+        padding: 16px;
+        min-height: 190px;
+    }
+
+    .genre-card h3 {
+        font-size: 20px;
+    }
+
+    .genre-card p {
+        font-size: 10px;
+    }
+
+    .artist-grid {
+        gap: 12px;
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .team-photo {
+        width: 85px;
+        height: 85px;
+    }
+}
 </style>
 </head>
+
 <body>
 
-<!-- DYNAMIC ISLAND MINI PLAYER -->
-<div id="miniPlayer" onclick="openMiniPlayer(event)">
-  <img id="miniImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200">
-  <div class="mini-info"><b id="miniTitle">Pick a song</b><span id="miniArtist">MOODIFY</span></div>
-  <div class="eq"><span></span><span></span><span></span></div>
-  <button class="mini-next" onclick="miniNext(event)">⏭</button>
-  <button class="mini-btn" id="miniPlayBtn" onclick="toggleMiniPlay(event)">⏸</button>
-  <div class="mini-progress"><div class="mini-progress-bar" id="miniProgressBar"></div></div>
-</div>
+<!-- NAVIGATION -->
 
 <header>
-<div class="logo">MOOD<span>IFY</span><small>MUSIC BY MOOD</small></div>
-<nav>
-<button class="active" onclick="showPage('home',this)">Home</button>
-<button onclick="showPage('songs',this)">Songs</button>
-<button onclick="showPage('liked',this)">Liked (<span id="likedCount">0</span>)</button>
-<button onclick="showPage('reco',this)">Recommendation</button>
-<button onclick="showPage('nowplaying',this)">Now Playing</button>
-<button onclick="showPage('feedback',this)">Feedback</button>
-<button onclick="showPage('about',this)">About Us</button>
-</nav>
+    <div class="container">
+        <nav>
+            <a href="#home" class="logo">MOODI<span>FY</span></a>
+
+            <div class="nav-links">
+                <a href="#home">HOME</a>
+                <a href="#featured">FEATURED</a>
+                <a href="#charts">OUR MUSIC</a>
+                <a href="player.html">LYRICS</a>
+                <a href="player.html">AUDIO</a>
+                <a href="video.html">VIDEO</a>
+                <a href="feedback.html">FEEDBACK</a>
+                <a href="#team">TEAM</a>
+            </div>
+        </nav>
+    </div>
 </header>
 
-<div id="page-home" class="page active"><div class="wrap">
-  <div class="hero">
-    <div class="hero-left">
-      <span class="badge">MOODIFY • MUSIC BY MOOD</span>
-      <h1>Feel The<br><span class="beat">Beat.</span><br><span class="beat2">Own Your Mood.</span></h1>
-      <p>Music that matches how you feel. Happy, sad, love, chill — pick your mood, press play, and let the lyrics move with the song.</p>
-      <div class="hero-stats">
-        <div><b>09</b><span>Songs</span></div>
-        <div><b>Top 5</b><span>Most Played</span></div>
-        <div><b>Live</b><span>Lyrics Sync</span></div>
-      </div>
-      <div class="hero-btns">
-        <button class="btn-dark" onclick="showPage('songs')">▶ Explore Songs</button>
-        <button class="btn-outline" onclick="showPage('liked')">❤️ My Liked Songs</button>
-      </div>
-    </div>
-    <div class="hero-right">
-      <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=900" alt="Concert">
-      <div class="caption">LIVE MUSIC • MOODIFY</div>
-    </div>
-  </div>
-  <div class="leopard-line" style="margin-top:16px;border-radius:999px"></div>
+<main>
 
-  <div class="section-cream">
-    <h2 class="section-title">Most Popular <span>This Week</span></h2>
-    <p class="section-sub">The songs everyone is playing right now. Tap the heart to save to Liked.</p>
-    <div class="grid" id="homeGrid"></div>
-  </div>
+<!-- HERO -->
 
-  <div class="section-leopard leopard-texture">
-    <h2 class="section-title">Recommended <span>For You</span></h2>
-    <p class="section-sub">Like a song first, we will recommend songs with a similar mood for you.</p>
-    <div class="grid" id="recoHomeGrid"></div>
-  </div>
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero-content">
 
-  <div class="section-cream">
-    <h2 class="section-title">Top Chart <span>• Top 5</span></h2>
-    <p class="section-sub">Ranked by plays in MOODIFY. The top song is in the middle.</p>
-    <div class="top3" id="top3Box"></div>
-    <div class="chart-box" id="chartBox"></div>
-  </div>
+            <div class="hero-tag">
+                YOUR MUSIC. YOUR MOOD. YOUR SPACE.
+            </div>
 
-  <div class="section-black">
-    <h2 class="section-title">Browse By <span>Mood</span></h2>
-    <p class="section-sub">Choose how you feel today, we will find the music for it.</p>
-    <div class="grid">
-      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600"><div class="card-body"><h3>Love</h3><p>I Think He Knows, Like I Want You — soft, warm, romantic songs.</p><button class="play-mini">Open →</button></div></div>
-      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600"><div class="card-body"><h3>Sad</h3><p>Dancing On My Own, Blind — songs for quiet nights and slow feelings.</p><button class="play-mini">Open →</button></div></div>
-      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600"><div class="card-body"><h3>Energetic</h3><p>EXO, Psycho — high energy songs to lift your mood up.</p><button class="play-mini">Open →</button></div></div>
-      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600"><div class="card-body"><h3>Chill</h3><p>The First Snow, Sole — calm songs for relaxing and studying.</p><button class="play-mini">Open →</button></div></div>
-    </div>
-  </div>
+            <h1>
+                Music is
+                <span>an experience.</span>
+            </h1>
 
-  <div class="section-leopard leopard-texture">
-    <h2 class="section-title">About <span>Us</span></h2>
-    <div class="about-grid">
-      <div class="about-card"><h3>We Are MOODIFY</h3><p>MOODIFY is our group project for Introduction to Web Development. We wanted a music website that is simple — listen by mood, like songs you love, get recommendations, and read lyrics that move with the song.</p><div class="member-mini"><span>Member 1</span><span>Member 2</span><span>Member 3</span><span>Member 4</span><span>Member 5</span></div><button class="btn-dark" style="margin-top:14px;background:#111;color:#fff" onclick="showPage('about')">Meet The Team →</button></div>
-      <div class="about-card"><h3>Why MOODIFY?</h3><p>Music by mood, not by random list. Liked Songs saved for you. Recommendations based on what you like. Lyrics that sync with the song. Fast, clean, no login needed.</p><p style="margin-top:10px;color:#111"><b>Group:</b> MOODIFY | <b>Course:</b> CMPF123</p></div>
-    </div>
-  </div>
-</div></div>
+            <p>
+                Discover new artists, explore different sounds and
+                experience music beyond boundaries. Welcome to your
+                personal music destination.
+            </p>
 
-<div id="page-songs" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">All Songs <span style="color:var(--leopard)">+ Up Next</span></h2>
-  <p class="section-sub" style="color:#999">Tap the heart to save to Liked. Tap a card to play the song.</p>
-  <div class="leopard-line" style="margin:12px 0;border-radius:999px"></div>
-  <div class="two-col">
-    <div class="grid" id="songGrid"></div>
-    <div class="queue-box">
-      <h3>Next Playing</h3>
-      <div class="next-playing"><img id="npImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200"><div><b id="npTitle" style="font-family:'Archivo',sans-serif">Pick a song first</b><p id="npArtist">MOODIFY</p></div></div>
-      <h3>Up Next In Queue</h3><div id="queueList"></div>
-      <button class="btn-dark" style="width:100%;margin-top:12px;background:#111;color:#fff" onclick="playNext()">▶ Play Next In Queue</button>
-    </div>
-  </div>
-</div></div>
+            <div class="hero-buttons">
+                <a href="#featured" class="main-btn">
+                    DISCOVER MUSIC
+                </a>
 
-<div id="page-liked" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Liked Songs</h2>
-  <p class="section-sub" id="likedSub" style="color:#999">Songs you liked will stay here even after refresh.</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
-    <button class="btn-dark" onclick="playAllLiked()">▶ Play All Liked</button>
-    <button class="btn-outline" onclick="clearLiked()">Clear Liked</button>
-    <button class="btn-outline" onclick="showPage('reco')">See Recommendation →</button>
-  </div>
-  <div class="grid" id="likedGrid"></div>
-  <div id="likedEmpty" style="display:none;background:#1C1A17;padding:26px;border-radius:18px;text-align:center;border:1px solid #33302A"><p style="color:#B8B2A5">You haven't liked any song yet. Go to Songs page and tap the heart on any song.</p></div>
-</div></div>
+                <a href="#charts" class="text-btn">
+                    EXPLORE OUR MUSIC
+                </a>
+            </div>
 
-<div id="page-reco" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Playlist Recommendation</h2>
-  <p class="section-sub" id="recoSub" style="color:#999">Based on your Liked Songs and what you are playing now.</p>
-  <div class="section-cream" style="margin-top:0" id="recoReasonBox">Like a song to unlock recommendations based on your taste.</div>
-  <h3 style="font-family:'Archivo',sans-serif;margin:20px 0 12px">Recommended Playlist For You</h3>
-  <div class="grid" id="recoGrid"></div>
-  <h3 style="font-family:'Archivo',sans-serif;margin:24px 0 12px">More Songs With A Similar Mood</h3>
-  <div class="grid" id="recoMoodGrid"></div>
-</div></div>
-
-<div id="page-nowplaying" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Now Playing + Lyrics</h2>
-  <div class="two-col" style="margin-top:14px">
-    <div class="player">
-      <div class="player-top">
-        <img id="mainImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400">
-        <div><p id="nowArtist2">MOODIFY</p><h2 id="nowTitle2">Pick a song first</h2><p style="color:#777;font-size:14px" id="nowMood">Tap Play on Songs page</p>
-        <div style="margin-top:10px"><button class="btn-dark" style="background:#111;color:#fff" id="nowLikeBtn" onclick="toggleLike(currentIndex)">Like This Song</button></div></div>
-      </div>
-      <audio id="mainAudio" controls></audio>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn-dark" style="background:#111;color:#fff" onclick="playPrev()">Prev</button>
-        <button class="btn-dark" style="background:#111;color:#fff" onclick="playNext()">Next</button>
-        <button class="btn-outline" style="color:#111;border-color:#DDD" onclick="showPage('songs')">Back to Songs</button>
-      </div>
-      <div class="lyrics-box">
-        <div class="lyrics-head">
-          <h3>Lyrics • Synced</h3>
-          <div class="lyric-offset">
-            <button type="button" onclick="adjustLyricOffset(-0.5)" title="Show lyrics later">−0.5s</button>
-            <span id="lyricOffsetLabel">Sync 0.0s</span>
-            <button type="button" onclick="adjustLyricOffset(0.5)" title="Show lyrics earlier">+0.5s</button>
-          </div>
         </div>
-        <div id="lyricsBox"><div class="lyric-line active">Tap any song, lyrics will show here and move with the song...</div></div>
-      </div>
-      <div style="margin-top:16px"><h3 style="font-family:'Archivo',sans-serif;color:#111;margin-bottom:10px">Because You Are Playing This</h3><div class="grid" id="nowRecoGrid"></div></div>
     </div>
-    <div class="queue-box"><h3>Up Next In Queue</h3><div id="queueList2"></div></div>
-  </div>
-</div></div>
+</section>
 
-<div id="page-feedback" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Give Us Feedback</h2>
-  <p class="section-sub" style="color:#999">Tell us what you think about the music and the website.</p>
-  <form onsubmit="return validateForm()">
-    <label>Name *</label><input id="name" placeholder="Full name">
-    <label>Gender *</label><select id="gender"><option value="">-- Select --</option><option>Male</option><option>Female</option><option>Other</option></select>
-    <label>Email *</label><input id="email" placeholder="example@gmail.com">
-    <label>Type *</label><select id="type"><option value="">-- Select --</option><option>Suggestion</option><option>Complaint</option><option>Enquiry</option></select>
-    <label>Feedback *</label><textarea id="feedback" rows="4" placeholder="Write here..."></textarea>
-    <label>Date & Time</label><input id="datetime" readonly>
-    <button class="btn-dark" style="margin-top:14px;background:#111;color:#fff" type="submit">Submit Feedback</button>
-  </form>
-  <div id="output" style="display:none;background:#fff;color:#111;padding:18px;border-radius:14px;margin-top:16px;border:1px solid #DDD"></div>
-</div></div>
+<!-- FEATURED GENRES -->
 
-<div id="page-about" class="page"><div class="wrap">
-  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">About Our Group</h2>
-  <p style="color:#aaa;margin:10px 0"><b>Group: MOODIFY</b> | CMPF123 - Introduction to Web Development</p>
-  <p style="color:#aaa;margin-bottom:18px">We are a group of students who love music. MOODIFY is our project to make listening to music easier — just pick a mood and play.</p>
-  <div class="grid">
-    <div class="member"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"><h3>Member 1 Name</h3><p>ID: XXXXXXXX</p></div>
-    <div class="member"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300"><h3>Member 2 Name</h3><p>ID: XXXXXXXX</p></div>
-    <div class="member"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300"><h3>Member 3 Name</h3><p>ID: XXXXXXXX</p></div>
-    <div class="member"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300"><h3>Member 4 Name</h3><p>ID: XXXXXXXX</p></div>
-    <div class="member"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300"><h3>Member 5 Name</h3><p>ID: XXXXXXXX</p></div>
-  </div>
-</div></div>
+<section id="featured">
+    <div class="container">
 
-<footer><p style="font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px">MOODIFY © 2026</p><br><a href="https://www.instagram.com/" target="_blank">Instagram</a><a href="https://www.tiktok.com/" target="_blank">TikTok</a><a href="https://www.youtube.com/" target="_blank">YouTube</a><a href="mailto:moodify@gmail.com">moodify@gmail.com</a></footer>
+        <div class="section-heading">
+            <small>EXPLORE THE SOUND</small>
+            <h2>Find Your Sound.</h2>
+            <p>Different genres, different moods, one destination.</p>
+        </div>
+
+        <div class="genre-grid">
+
+            <a href="#pop" class="genre-card pop-card">
+                <div class="genre-content">
+                    <span class="genre-number">01 / POP</span>
+                    <h3>Modern Pop</h3>
+                    <p>Fresh sounds and catchy melodies.</p>
+                </div>
+            </a>
+
+            <a href="#kpop" class="genre-card kpop-card">
+                <div class="genre-content">
+                    <span class="genre-number">02 / K-POP</span>
+                    <h3>K-Pop Selection</h3>
+                    <p>Explore the world of Korean music.</p>
+                </div>
+            </a>
+
+            <a href="#rnb" class="genre-card rnb-card">
+                <div class="genre-content">
+                    <span class="genre-number">03 / R&B</span>
+                    <h3>R&B Sessions</h3>
+                    <p>Smooth rhythms and soulful sounds.</p>
+                </div>
+            </a>
+
+            <a href="#hiphop" class="genre-card hiphop-card">
+                <div class="genre-content">
+                    <span class="genre-number">04 / HIP-HOP</span>
+                    <h3>Hip-Hop</h3>
+                    <p>Beats, rhythm and creativity.</p>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<!-- OUR MUSIC TASTE -->
+
+<section class="songs-section" id="charts">
+    <div class="container">
+
+        <div class="section-heading">
+            <small>OUR PLAYLIST</small>
+            <h2>Our Music Taste.</h2>
+            <p>Twenty songs, four genres, different music tastes.</p>
+        </div>
+
+        <input
+            type="text"
+            id="songSearch"
+            class="search-box"
+            placeholder="Search song or artist..."
+            aria-label="Search songs"
+        >
+
+        <!-- POP -->
+
+        <div id="pop">
+            <div class="genre-heading">
+                <h3>Modern Pop</h3>
+                <span>01 — POP</span>
+            </div>
+
+            <div class="music-list">
+
+                <div class="music-row" data-search="as it was harry styles">
+                    <span class="song-number">01</span>
+                    <div class="album-cover" data-query="As It Was Harry Styles">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>As It Was</h4>
+                        <p>Harry Styles</p>
+                    </div>
+                    <span class="song-type">POP</span>
+                </div>
+
+                <div class="music-row" data-search="i think he knows taylor swift">
+                    <span class="song-number">02</span>
+                    <div class="album-cover" data-query="I Think He Knows Taylor Swift">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>I Think He Knows</h4>
+                        <p>Taylor Swift</p>
+                    </div>
+                    <span class="song-type">POP</span>
+                </div>
+
+                <div class="music-row" data-search="all too well 10 minute version taylor swift">
+                    <span class="song-number">03</span>
+                    <div class="album-cover" data-query="All Too Well Taylor Swift 10 Minute Version">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>All Too Well (10 Minute Version)</h4>
+                        <p>Taylor Swift</p>
+                    </div>
+                    <span class="song-type">POP</span>
+                </div>
+
+                <div class="music-row" data-search="dancing on my own robyn">
+                    <span class="song-number">04</span>
+                    <div class="album-cover" data-query="Dancing On My Own Robyn">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Dancing On My Own</h4>
+                        <p>Robyn</p>
+                    </div>
+                    <span class="song-type">POP</span>
+                </div>
+
+                <div class="music-row" data-search="quit playing games with my heart backstreet boys">
+                    <span class="song-number">05</span>
+                    <div class="album-cover" data-query="Quit Playing Games With My Heart Backstreet Boys">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Quit Playing Games (With My Heart)</h4>
+                        <p>Backstreet Boys</p>
+                    </div>
+                    <span class="song-type">POP</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- K-POP -->
+
+        <div id="kpop">
+            <div class="genre-heading">
+                <h3>K-Pop Selection</h3>
+                <span>02 — K-POP</span>
+            </div>
+
+            <div class="music-list">
+
+                <div class="music-row" data-search="the first snow exo">
+                    <span class="song-number">01</span>
+                    <div class="album-cover" data-query="The First Snow EXO">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>The First Snow</h4>
+                        <p>EXO</p>
+                    </div>
+                    <span class="song-type">K-POP</span>
+                </div>
+
+                <div class="music-row" data-search="just us 2 exo sc">
+                    <span class="song-number">02</span>
+                    <div class="album-cover" data-query="Just Us 2 EXO SC">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Just Us 2</h4>
+                        <p>EXO-SC</p>
+                    </div>
+                    <span class="song-type">K-POP</span>
+                </div>
+
+                <div class="music-row" data-search="psycho red velvet">
+                    <span class="song-number">03</span>
+                    <div class="album-cover" data-query="Psycho Red Velvet">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Psycho</h4>
+                        <p>Red Velvet</p>
+                    </div>
+                    <span class="song-type">K-POP</span>
+                </div>
+
+                <div class="music-row" data-search="so lets love day6">
+                    <span class="song-number">04</span>
+                    <div class="album-cover" data-query="So Let's Love DAY6">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>So Let's Love</h4>
+                        <p>DAY6</p>
+                    </div>
+                    <span class="song-type">K-POP</span>
+                </div>
+
+                <div class="music-row" data-search="blind enhypen">
+                    <span class="song-number">05</span>
+                    <div class="album-cover" data-query="Blind ENHYPEN">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Blind</h4>
+                        <p>ENHYPEN</p>
+                    </div>
+                    <span class="song-type">K-POP</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- R&B -->
+
+        <div id="rnb">
+            <div class="genre-heading">
+                <h3>R&B Sessions</h3>
+                <span>03 — R&B</span>
+            </div>
+
+            <div class="music-list">
+
+                <div class="music-row" data-search="like i want you giveon">
+                    <span class="song-number">01</span>
+                    <div class="album-cover" data-query="Like I Want You Giveon">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Like I Want You</h4>
+                        <p>Giveon</p>
+                    </div>
+                    <span class="song-type">R&B</span>
+                </div>
+
+                <div class="music-row" data-search="i swear ill never leave again keshi">
+                    <span class="song-number">02</span>
+                    <div class="album-cover" data-query="I Swear I'll Never Leave Again keshi">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>I Swear I'll Never Leave Again</h4>
+                        <p>keshi</p>
+                    </div>
+                    <span class="song-type">R&B</span>
+                </div>
+
+                <div class="music-row" data-search="best part daniel caesar her">
+                    <span class="song-number">03</span>
+                    <div class="album-cover" data-query="Best Part Daniel Caesar H.E.R.">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Best Part</h4>
+                        <p>Daniel Caesar ft. H.E.R.</p>
+                    </div>
+                    <span class="song-type">R&B</span>
+                </div>
+
+                <div class="music-row" data-search="folded kehlani">
+                    <span class="song-number">04</span>
+                    <div class="album-cover" data-query="Folded Kehlani">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Folded</h4>
+                        <p>Kehlani</p>
+                    </div>
+                    <span class="song-type">R&B</span>
+                </div>
+
+                <div class="music-row" data-search="open arms sza travis scott">
+                    <span class="song-number">05</span>
+                    <div class="album-cover" data-query="Open Arms SZA Travis Scott">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Open Arms</h4>
+                        <p>SZA ft. Travis Scott</p>
+                    </div>
+                    <span class="song-type">R&B</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- HIP-HOP -->
+
+        <div id="hiphop">
+            <div class="genre-heading">
+                <h3>Hip-Hop</h3>
+                <span>04 — HIP-HOP</span>
+            </div>
+
+            <div class="music-list">
+
+                <div class="music-row" data-search="ingat">
+                    <span class="song-number">01</span>
+                    <div class="album-cover" data-query="Ingat song">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Ingat</h4>
+                        <p>Artist to be confirmed</p>
+                    </div>
+                    <span class="song-type">HIP-HOP</span>
+                </div>
+
+                <div class="music-row" data-search="i know travis scott">
+                    <span class="song-number">02</span>
+                    <div class="album-cover" data-query="I KNOW? Travis Scott">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>I KNOW ?</h4>
+                        <p>Travis Scott</p>
+                    </div>
+                    <span class="song-type">HIP-HOP</span>
+                </div>
+
+                <div class="music-row" data-search="lose my mind don toliver doja cat">
+                    <span class="song-number">03</span>
+                    <div class="album-cover" data-query="Lose My Mind Don Toliver Doja Cat">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Lose My Mind</h4>
+                        <p>Don Toliver ft. Doja Cat</p>
+                    </div>
+                    <span class="song-type">HIP-HOP</span>
+                </div>
+
+                <div class="music-row" data-search="psycho post malone ty dolla sign">
+                    <span class="song-number">04</span>
+                    <div class="album-cover" data-query="Psycho Post Malone Ty Dolla Sign">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Psycho</h4>
+                        <p>Post Malone ft. Ty Dolla $ign</p>
+                    </div>
+                    <span class="song-type">HIP-HOP</span>
+                </div>
+
+                <div class="music-row" data-search="luther kendrick lamar sza">
+                    <span class="song-number">05</span>
+                    <div class="album-cover" data-query="Luther Kendrick Lamar SZA">
+                        <div class="cover-placeholder">♪</div>
+                    </div>
+                    <div class="song-details">
+                        <h4>Luther</h4>
+                        <p>Kendrick Lamar & SZA</p>
+                    </div>
+                    <span class="song-type">HIP-HOP</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ARTIST SPOTLIGHT -->
+
+<section class="artist-section" id="artists">
+    <div class="container">
+
+        <div class="section-heading">
+            <small>ARTIST DISCOVERY</small>
+            <h2>Beyond the Music.</h2>
+            <p>Four artists, four different sounds and styles.</p>
+        </div>
+
+        <div class="artist-grid">
+
+            <a class="artist-card"
+               href="https://www.youtube.com/results?search_query=The+Weeknd"
+               target="_blank" rel="noopener">
+                <div class="artist-image" data-artist="The Weeknd">
+                    <div class="cover-placeholder">♪</div>
+                </div>
+                <small>ARTIST SPOTLIGHT</small>
+                <h3>The Weeknd</h3>
+            </a>
+
+            <a class="artist-card"
+               href="https://www.youtube.com/results?search_query=Tate+McRae"
+               target="_blank" rel="noopener">
+                <div class="artist-image" data-artist="Tate McRae">
+                    <div class="cover-placeholder">♪</div>
+                </div>
+                <small>ARTIST SPOTLIGHT</small>
+                <h3>Tate McRae</h3>
+            </a>
+
+            <a class="artist-card"
+               href="https://www.youtube.com/results?search_query=Jennie+Blackpink"
+               target="_blank" rel="noopener">
+                <div class="artist-image" data-artist="JENNIE">
+                    <div class="cover-placeholder">♪</div>
+                </div>
+                <small>ARTIST SPOTLIGHT</small>
+                <h3>JENNIE</h3>
+            </a>
+
+            <a class="artist-card"
+               href="https://www.youtube.com/results?search_query=Olivia+Rodrigo"
+               target="_blank" rel="noopener">
+                <div class="artist-image" data-artist="Olivia Rodrigo">
+                    <div class="cover-placeholder">♪</div>
+                </div>
+                <small>ARTIST SPOTLIGHT</small>
+                <h3>Olivia Rodrigo</h3>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<!-- TEAM -->
+
+<section class="team-section" id="team">
+    <div class="container">
+
+        <div class="section-heading">
+            <small>THE PEOPLE BEHIND IT</small>
+            <h2>Meet Our Team.</h2>
+            <p>
+                Meet the team members who worked together
+                to create this music website.
+            </p>
+        </div>
+
+        <div class="team-grid">
+
+            <div class="team-card">
+                <div class="team-photo">L</div>
+                <h3>Lily Khairunnisa Intisar</h3>
+                <p>Student ID: To be updated</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-photo">H</div>
+                <h3>Huda</h3>
+                <p>Student ID: To be updated</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-photo">M</div>
+                <h3>Mia</h3>
+                <p>Student ID: To be updated</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-photo">D</div>
+                <h3>Danny</h3>
+                <p>Student ID: To be updated</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-photo">N</div>
+                <h3>Nik</h3>
+                <p>Student ID: To be updated</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+
+<footer>
+    <div class="container">
+
+        <h2>MOODI<span>FY</span></h2>
+        <p>Music Beyond Boundaries.</p>
+
+        <div class="footer-links">
+            <a href="#home">Home</a>
+            <a href="#featured">Featured</a>
+            <a href="#charts">Our Music</a>
+            <a href="#artists">Artists</a>
+            <a href="#team">Team</a>
+            <a href="player.html">Lyrics</a>
+            <a href="player.html">Audio</a>
+            <a href="video.html">Video</a>
+            <a href="feedback.html">Feedback</a>
+        </div>
+
+        <p>&copy; 2026 MOODIFY. All rights reserved.</p>
+
+    </div>
+</footer>
 
 <script>
-const mySongs = [
-  {title:"As It Was", artist:"Harry Styles", mood:"Happy / Pop", mp3:"asitwas.mp3", lyricIndex:0, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:98, genre:"Pop"},
-  {title:"I Think He Knows", artist:"Taylor Swift", mood:"Love / Pop", mp3:"ithinkheknows.mp3", lyricIndex:1, img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600", plays:92, genre:"Pop"},
-  {title:"Dancing On My Own", artist:"Robyn", mood:"Sad / Dance", mp3:"dancingonmyown.mp3", lyricIndex:3, img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600", plays:85, genre:"Dance"},
-  {title:"Blind", artist:"ENHYPEN", mood:"Chill / R&B", mp3:"blind.mp3", lyricIndex:9, img:"https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600", plays:78, genre:"R&B"},
-  {title:"Like I Want You", artist:"Giveon", mood:"Love / R&B", mp3:"likeiwantyou.mp3", lyricIndex:10, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:74, genre:"R&B"},
-  {title:"Just Us 2", artist:"EXO-SC", mood:"Energetic / K-Pop", mp3:"exosc.mp3", lyricIndex:6, img:"https://images.unsplash.com/photo-1459749411175-04bf6732d85d?w=600", plays:71, genre:"K-Pop"},
-  {title:"Psycho", artist:"Red Velvet", mood:"Pop / K-Pop", mp3:"redvelvetpsyhco.mp3", lyricIndex:7, img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600", plays:69, genre:"K-Pop"},
-  {title:"So Let's Love", artist:"DAY6", mood:"Chill / Love", mp3:"solet'slove.mp3", lyricIndex:8, img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600", plays:64, genre:"Chill"},
-  {title:"The First Snow", artist:"EXO", mood:"Winter / Chill", mp3:"thefirstsnow.mp3", lyricIndex:5, img:"https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600", plays:88, genre:"K-Pop"},
-];
 
-let currentIndex = -1;
-let lyricLines = [];
-let lyricEls = [];
-let lyricMode = 'none';
-let lyricOffset = 0;
-let activeLyricIndex = -1;
-const LYRIC_OFFSET_KEY = 'moodify_lyric_offsets';
-let lyricOffsets = JSON.parse(localStorage.getItem(LYRIC_OFFSET_KEY) || '{}');
+/* SEARCH FUNCTION */
 
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+const searchInput = document.getElementById("songSearch");
 
-function updateLyricOffsetLabel(){
-  const label = document.getElementById('lyricOffsetLabel');
-  if(!label) return;
-  label.textContent = lyricMode === 'timed'
-    ? 'Sync ' + (lyricOffset > 0 ? '+' : '') + lyricOffset.toFixed(1) + 's'
-    : 'No sync data';
-  document.querySelectorAll('.lyric-offset button').forEach(b => { b.disabled = lyricMode !== 'timed'; });
-}
+searchInput.addEventListener("input", function() {
 
-function updateActiveLyric(){
-  if(lyricMode !== 'timed' || !lyricEls.length) return;
-  const t = audioEl.currentTime + lyricOffset;
-  let idx = 0;
-  for(let k = 0; k < lyricLines.length; k++){
-    if(lyricLines[k].t <= t) idx = k;
-    else break;
-  }
-  if(idx === activeLyricIndex) return;
-  if(activeLyricIndex >= 0 && lyricEls[activeLyricIndex]) lyricEls[activeLyricIndex].classList.remove('active');
-  activeLyricIndex = idx;
-  if(lyricEls[idx]){
-    lyricEls[idx].classList.add('active');
-    lyricEls[idx].scrollIntoView({behavior:'smooth', block:'center'});
-  }
-}
+    const filter = this.value.toLowerCase().trim();
 
-function adjustLyricOffset(delta){
-  if(lyricMode !== 'timed') return;
-  lyricOffset = Math.max(-10, Math.min(10, Math.round((lyricOffset + delta) * 10) / 10));
-  lyricOffsets[currentIndex] = lyricOffset;
-  localStorage.setItem(LYRIC_OFFSET_KEY, JSON.stringify(lyricOffsets));
-  updateLyricOffsetLabel();
-  updateActiveLyric();
-}
-let likedSongs = JSON.parse(localStorage.getItem('moodify_liked') || '[]');
-function saveLiked(){ localStorage.setItem('moodify_liked', JSON.stringify(likedSongs)); document.getElementById('likedCount').innerText = likedSongs.length; }
-function isLiked(i){ return likedSongs.includes(i); }
-function toggleLike(i, event){
-  if(event) event.stopPropagation();
-  if(i===-1 || i===null) return alert("Play a song first!");
-  if(isLiked(i)){ likedSongs = likedSongs.filter(x=>x!==i); } else { likedSongs.push(i); }
-  saveLiked(); renderAll();
-  let btn = document.getElementById('nowLikeBtn');
-  if(btn) btn.innerText = isLiked(currentIndex) ? "Liked!" : "Like This Song";
-}
-function clearLiked(){ if(!confirm("Clear all liked songs?")) return; likedSongs=[]; saveLiked(); renderAll(); }
-function playAllLiked(){ if(!likedSongs.length) return alert("Like a song first!"); playSong(likedSongs[0]); }
+    const rows = document.querySelectorAll(".music-row");
 
-// ===== DYNAMIC ISLAND FUNCTIONS =====
-function updateMiniPlayer(){
-  let mini = document.getElementById('miniPlayer');
-  if(currentIndex === -1){ mini.classList.remove('show'); document.body.classList.remove('playing'); return; }
-  let s = mySongs[currentIndex];
-  mini.classList.add('show');
-  document.body.classList.add('playing');
-  document.getElementById('miniImg').src = s.img;
-  document.getElementById('miniTitle').innerText = s.title;
-  document.getElementById('miniArtist').innerText = s.artist;
-}
-function openMiniPlayer(e){
-  // Kalau tekan butang, jangan buka page - butang tu handle sendiri
-  if(e.target.closest('button')) return;
-  showPage('nowplaying');
-}
-function toggleMiniPlay(e){
-  e.stopPropagation();
-  let audio = document.getElementById('mainAudio');
-  if(audio.paused){ audio.play(); } else { audio.pause(); }
-}
-function miniNext(e){
-  e.stopPropagation();
-  playNext();
-}
-function getRecommendations(){
-  if(!likedSongs.length && currentIndex===-1){
-    return {list:[...mySongs].sort((a,b)=>b.plays-a.plays).slice(0,4), reason:"Top songs in MOODIFY — like a song to get recommendations based on your taste."};
-  }
-  let baseIdx = likedSongs.length ? likedSongs : [currentIndex];
-  let baseMoods = baseIdx.map(i=>mySongs[i].mood);
-  let baseGenres = baseIdx.map(i=>mySongs[i].genre);
-  let baseArtists = baseIdx.map(i=>mySongs[i].artist);
-  let scored = mySongs.map((s,i)=>{
-    let score = s.plays * 0.3;
-    if(baseMoods.some(m=>s.mood===m)) score += 50;
-    if(baseGenres.includes(s.genre)) score += 40;
-    if(baseArtists.includes(s.artist)) score += 30;
-    if(likedSongs.includes(i)) score -= 100;
-    return {song:s, idx:i, score};
-  }).sort((a,b)=>b.score-a.score);
-  let likedNames = baseIdx.map(i=>mySongs[i].title).join(", ");
-  return {list: scored.slice(0,4).map(x=>x.song), reason:`Because you liked: <b>${likedNames}</b> — we picked songs with a similar mood and style for you.`};
-}
-function songCard(s, i, badge){
-  return `<div class="card" onclick="playSong(${i})">
-    <button class="heart-btn ${isLiked(i)?'liked':''}" onclick="toggleLike(${i}, event)">${isLiked(i)?'❤️':'♡'}</button>
-    ${badge?`<span class="rank-badge">${badge}</span>`:''}
-    <img src="${s.img}"><div class="card-body"><h3>${s.title}</h3><p>${s.artist} • ${s.mood}</p><span class="reco-tag">${s.genre}</span><span class="reco-tag">${s.plays}% plays</span><div style="margin-top:12px"><button class="play-mini">▶ Play Song</button></div></div>
-  </div>`;
-}
-function showPage(name, btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function renderAll(){
-  saveLiked();
-  let sorted = [...mySongs].sort((a,b)=>b.plays-a.plays);
-  document.getElementById('songGrid').innerHTML = mySongs.map((s,i)=>songCard(s,i)).join('');
-  document.getElementById('homeGrid').innerHTML = sorted.slice(0,4).map((s)=>{
-    let idx = mySongs.indexOf(s);
-    return songCard(s, idx, `#${sorted.indexOf(s)+1} POPULAR`);
-  }).join('');
-  let topOrder = [sorted[1], sorted[0], sorted[2]];
-  let topPos = ["No. 2","No. 1","No. 3"];
-  document.getElementById('top3Box').innerHTML = topOrder.map((s,pi)=>{
-    let idx = mySongs.indexOf(s);
-    return `<div class="top3-card ${pi===1?'first':''}" onclick="playSong(${idx});showPage('nowplaying')"><span class="pos">${topPos[pi]}</span><img src="${s.img}"><h4>${s.title}</h4><p>${s.artist} • ${s.plays}%</p><div class="top3-bar" style="width:${s.plays}%"></div></div>`
-  }).join('');
-  document.getElementById('chartBox').innerHTML = sorted.slice(0,5).map((s)=>{
-    let idx = mySongs.indexOf(s); let rank = sorted.indexOf(s)+1;
-    return `<div class="chart-row" onclick="playSong(${idx});showPage('nowplaying')"><span class="num">0${rank}</span><img src="${s.img}"><div class="info"><b>${s.title}</b><p>${s.artist} • ${s.mood}</p></div><div class="bar-wrap"><div class="bar" style="width:${s.plays}%"></div></div><span class="pct">${s.plays}%</span><button class="heart-btn ${isLiked(idx)?'liked':''}" style="position:static" onclick="toggleLike(${idx},event)">${isLiked(idx)?'❤️':'♡'}</button></div>`
-  }).join('');
-  let likedGrid = document.getElementById('likedGrid');
-  let empty = document.getElementById('likedEmpty');
-  if(!likedSongs.length){ likedGrid.innerHTML=''; empty.style.display='block'; document.getElementById('likedSub').innerText = "You have 0 liked songs."; }
-  else { empty.style.display='none'; likedGrid.innerHTML = likedSongs.map(i=>songCard(mySongs[i], i, "LIKED")).join(''); document.getElementById('likedSub').innerText = `You have ${likedSongs.length} liked songs.`; }
-  let reco = getRecommendations();
-  document.getElementById('recoSub').innerText = likedSongs.length ? `Based on ${likedSongs.length} liked songs.` : "Like a song to unlock recommendations based on your taste.";
-  document.getElementById('recoReasonBox').innerHTML = reco.reason;
-  document.getElementById('recoGrid').innerHTML = reco.list.map(s=>songCard(s, mySongs.indexOf(s), "RECOMMENDED")).join('');
-  document.getElementById('recoHomeGrid').innerHTML = reco.list.map(s=>songCard(s, mySongs.indexOf(s), "FOR YOU")).join('');
-  let base = currentIndex!==-1 ? mySongs[currentIndex] : (likedSongs.length ? mySongs[likedSongs[0]] : mySongs[0]);
-  let sameMood = mySongs.filter((s,i)=> i!==mySongs.indexOf(base) && (s.genre===base.genre || s.mood===base.mood));
-  if(!sameMood.length) sameMood = [...mySongs].sort((a,b)=>b.plays-a.plays).slice(0,4);
-  document.getElementById('recoMoodGrid').innerHTML = sameMood.slice(0,4).map(s=>songCard(s, mySongs.indexOf(s), `SIMILAR MOOD • ${base.mood}`)).join('');
-  if(currentIndex!==-1){
-    let nowReco = getRecommendations().list.filter(s=>mySongs.indexOf(s)!==currentIndex).slice(0,2);
-    document.getElementById('nowRecoGrid').innerHTML = nowReco.map(s=>songCard(s, mySongs.indexOf(s), "NEXT?")).join('');
-  }
-  renderQueue();
-  updateMiniPlayer();
-}
-function playSong(i){
-  currentIndex = i;
-  const s = mySongs[i];
-  const audio = document.getElementById('mainAudio');
-  audio.src = s.mp3; audio.play();
-  document.getElementById('nowTitle2').innerText = s.title;
-  document.getElementById('nowArtist2').innerText = s.artist;
-  document.getElementById('nowMood').innerText = s.mood;
-  document.getElementById('mainImg').src = s.img;
-  document.getElementById('nowLikeBtn').innerText = isLiked(i) ? "Liked!" : "Like This Song";
-  const next = mySongs[(i+1)%mySongs.length];
-  document.getElementById('npTitle').innerText = next.title;
-  document.getElementById('npArtist').innerText = next.artist + " • Next";
-  document.getElementById('npImg').src = next.img;
-  const box = document.getElementById('lyricsBox');
-  lyricLines = [];
-  lyricEls = [];
-  lyricMode = 'none';
-  activeLyricIndex = -1;
+    const genreSections = [
+        "pop",
+        "kpop",
+        "rnb",
+        "hiphop"
+    ];
 
-  const timed = window.timedLyrics ? window.timedLyrics[i] : null;
-  if(timed && Array.isArray(timed.lines) && timed.lines.length){
-    lyricMode = 'timed';
-    lyricLines = timed.lines;
-    lyricOffset = Number(lyricOffsets[i] || 0);
-    updateLyricOffsetLabel();
-    box.innerHTML = lyricLines.map((line, idx)=>
-      `<div class="lyric-line" id="line-${idx}" data-time="${line.t}">${escapeHtml(line.text)}</div>`
-    ).join('');
-    lyricEls = [...box.querySelectorAll('.lyric-line')];
-    updateActiveLyric();
-  } else {
-    const data = window.songLyricsDatabase ? window.songLyricsDatabase[s.lyricIndex] : null;
-    lyricOffset = 0;
-    if(data && data.lines){
-      const lines = Array.isArray(data.lines) ? data.lines : data.lines.split("\n");
-      lyricLines = lines.filter(l => l.trim() !== "");
-      lyricMode = 'plain';
-      box.innerHTML = lyricLines.map((line, idx)=>
-        `<div class="lyric-line${idx === 0 ? ' active' : ''}" id="line-${idx}">${escapeHtml(line)}</div>`
-      ).join('');
-      lyricEls = [...box.querySelectorAll('.lyric-line')];
-    } else {
-      box.innerHTML = `<div class="lyric-line active">Lyrics not available for this song.</div>`;
+    rows.forEach(row => {
+        const text = row.dataset.search.toLowerCase();
+        row.style.display = text.includes(filter) ? "grid" : "none";
+    });
+
+    genreSections.forEach(id => {
+        const section = document.getElementById(id);
+
+        const visibleRows = section.querySelectorAll(
+            '.music-row:not([style*="display: none"])'
+        );
+
+        section.style.display =
+            visibleRows.length > 0 ? "block" : "none";
+    });
+
+});
+
+/* LOAD ALBUM ARTWORK */
+
+async function loadAlbumArtwork() {
+
+    const covers = document.querySelectorAll(
+        ".album-cover[data-query]"
+    );
+
+    for (const cover of covers) {
+
+        const query = cover.dataset.query;
+
+        try {
+
+            const response = await fetch(
+                "https://itunes.apple.com/search?term=" +
+                encodeURIComponent(query) +
+                "&entity=song&limit=5"
+            );
+
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+
+                const result = data.results[0];
+
+                const imageUrl = result.artworkUrl100
+                    ? result.artworkUrl100.replace(
+                        "100x100bb",
+                        "600x600bb"
+                    )
+                    : "";
+
+                if (imageUrl) {
+
+                    cover.innerHTML = "";
+
+                    const img = document.createElement("img");
+
+                    img.src = imageUrl;
+                    img.alt = result.trackName + " album artwork";
+                    img.loading = "lazy";
+
+                    img.onerror = function() {
+                        cover.innerHTML =
+                            '<div class="cover-placeholder">♪</div>';
+                    };
+
+                    cover.appendChild(img);
+                }
+            }
+
+        } catch (error) {
+            console.log("Artwork could not load:", query);
+        }
     }
-    updateLyricOffsetLabel();
-  }
-  renderAll();
-  updateMiniPlayer();
-  showPage('nowplaying');
 }
-const audioEl = document.getElementById('mainAudio');
-audioEl.addEventListener('play', ()=>{
-  document.getElementById('miniPlayBtn').innerText = "⏸";
-  document.getElementById('miniPlayer').classList.remove('paused');
-});
-audioEl.addEventListener('pause', ()=>{
-  document.getElementById('miniPlayBtn').innerText = "▶";
-  document.getElementById('miniPlayer').classList.add('paused');
-});
-audioEl.addEventListener('timeupdate', ()=>{
-  // Progress bar kat Dynamic Island
-  if(audioEl.duration){
-    let pct = (audioEl.currentTime / audioEl.duration) * 100;
-    document.getElementById('miniProgressBar').style.width = pct + "%";
-  }
-  if(lyricMode === 'timed') updateActiveLyric();
-});
-audioEl.addEventListener('ended', ()=>{ playNext(); });
-function playNext(){ if(currentIndex===-1) playSong(0); else playSong((currentIndex+1)%mySongs.length); }
-function playPrev(){ if(currentIndex===-1) playSong(0); else playSong((currentIndex-1+mySongs.length)%mySongs.length); }
-function renderQueue(){
-  const list = mySongs.map((s,i)=>`
-    <div class="q-item ${i===currentIndex?'active':''}" onclick="playSong(${i})">
-      <span style="color:#8A7A64;font-weight:900;width:20px;font-family:'Archivo',sans-serif">${i+1}</span><img src="${s.img}"><div><b>${s.title}</b><p>${s.artist}</p></div>
-      <span style="margin-left:auto;color:#8A7A64">${isLiked(i)?'❤️':'▶'}</span>
-    </div>`).join('');
-  document.getElementById('queueList').innerHTML = list;
-  document.getElementById('queueList2').innerHTML = list;
+
+/* LOAD ARTIST MUSIC ARTWORK */
+
+async function loadArtistImages() {
+
+    const artists = document.querySelectorAll(
+        ".artist-image[data-artist]"
+    );
+
+    for (const artist of artists) {
+
+        const name = artist.dataset.artist;
+
+        try {
+
+            const response = await fetch(
+                "https://itunes.apple.com/search?term=" +
+                encodeURIComponent(name) +
+                "&entity=song&limit=5"
+            );
+
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+
+                const imageUrl = data.results[0].artworkUrl100
+                    ? data.results[0].artworkUrl100.replace(
+                        "100x100bb",
+                        "600x600bb"
+                    )
+                    : "";
+
+                if (imageUrl) {
+
+                    artist.innerHTML = "";
+
+                    const img = document.createElement("img");
+
+                    img.src = imageUrl;
+                    img.alt = name + " music artwork";
+                    img.loading = "lazy";
+
+                    artist.appendChild(img);
+                }
+            }
+
+        } catch (error) {
+            console.log("Artist artwork could not load:", name);
+        }
+    }
 }
-document.getElementById('datetime').value = new Date().toLocaleString();
-function validateForm(){
-  let name=document.getElementById('name').value.trim();
-  let gender=document.getElementById('gender').value;
-  let email=document.getElementById('email').value.trim();
-  let type=document.getElementById('type').value;
-  let feedback=document.getElementById('feedback').value.trim();
-  if(!name) return alert("Please enter Name!");
-  if(!gender) return alert("Please select Gender!");
-  if(!email||!email.includes("@")) return alert("Please enter valid Email!");
-  if(!type) return alert("Please select Type!");
-  if(!feedback) return alert("Please enter Feedback!");
-  let out=document.getElementById('output'); out.style.display="block";
-  out.innerHTML=`<h3>Thank You!</h3><p><b>Name:</b> ${name}</p><p><b>Gender:</b> ${gender}</p><p><b>Email:</b> ${email}</p><p><b>Type:</b> ${type}</p><p><b>Feedback:</b> ${feedback}</p><p><b>Date:</b> ${document.getElementById('datetime').value}</p>`;
-  return false;
-}
-renderAll();
+
+loadAlbumArtwork();
+loadArtistImages();
+
 </script>
+
 </body>
 </html>
