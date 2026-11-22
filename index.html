@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MOODIFY</title>
 <script src="lyrics.js"></script>
+<script src="lyrics-timed.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -154,6 +155,13 @@ body.playing .wrap{padding-top:155px}
 audio{width:100%;margin:12px 0}
 .lyrics-box{background:#111;border-radius:16px;padding:20px;max-height:430px;overflow:auto;margin-top:10px}
 .lyrics-box h3{color:#E8DFD0;font-size:12px;letter-spacing:3px;margin-bottom:10px;font-family:'Archivo',sans-serif}
+.lyrics-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.lyrics-head h3{margin-bottom:0}
+.lyric-offset{display:flex;align-items:center;gap:6px}
+.lyric-offset button{background:#1C1A17;color:#E8DFD0;border:1px solid #3A342C;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Archivo',sans-serif}
+.lyric-offset button:hover:not(:disabled){background:#E8DFD0;color:#111}
+.lyric-offset button:disabled{opacity:.4;cursor:not-allowed}
+#lyricOffsetLabel{font-size:10px;color:#8A7A64;min-width:76px;text-align:center;font-family:'Archivo',sans-serif}
 .lyric-line{font-family:'Inter Tight',sans-serif;font-size:21px;font-weight:700;line-height:1.4;color:#666;padding:5px 0;transition:.25s}
 .lyric-line.active{color:#fff;transform:translateX(4px)}
 
@@ -307,7 +315,17 @@ footer a{color:#E8DFD0;margin:0 8px;font-family:'Archivo',sans-serif;font-size:1
         <button class="btn-dark" style="background:#111;color:#fff" onclick="playNext()">Next</button>
         <button class="btn-outline" style="color:#111;border-color:#DDD" onclick="showPage('songs')">Back to Songs</button>
       </div>
-      <div class="lyrics-box"><h3>Lyrics • Synced</h3><div id="lyricsBox"><div class="lyric-line active">Tap any song, lyrics will show here and move with the song...</div></div></div>
+      <div class="lyrics-box">
+        <div class="lyrics-head">
+          <h3>Lyrics • Synced</h3>
+          <div class="lyric-offset">
+            <button type="button" onclick="adjustLyricOffset(-0.5)" title="Show lyrics later">−0.5s</button>
+            <span id="lyricOffsetLabel">Sync 0.0s</span>
+            <button type="button" onclick="adjustLyricOffset(0.5)" title="Show lyrics earlier">+0.5s</button>
+          </div>
+        </div>
+        <div id="lyricsBox"><div class="lyric-line active">Tap any song, lyrics will show here and move with the song...</div></div>
+      </div>
       <div style="margin-top:16px"><h3 style="font-family:'Archivo',sans-serif;color:#111;margin-bottom:10px">Because You Are Playing This</h3><div class="grid" id="nowRecoGrid"></div></div>
     </div>
     <div class="queue-box"><h3>Up Next In Queue</h3><div id="queueList2"></div></div>
@@ -348,22 +366,62 @@ footer a{color:#E8DFD0;margin:0 8px;font-family:'Archivo',sans-serif;font-size:1
 const mySongs = [
   {title:"As It Was", artist:"Harry Styles", mood:"Happy / Pop", mp3:"asitwas.mp3", lyricIndex:0, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:98, genre:"Pop"},
   {title:"I Think He Knows", artist:"Taylor Swift", mood:"Love / Pop", mp3:"ithinkheknows.mp3", lyricIndex:1, img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600", plays:92, genre:"Pop"},
-  {title:"Dancing On My Own", artist:"Robyn", mood:"Sad / Dance", mp3:"dancingonmyown.mp3", lyricIndex:2, img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600", plays:85, genre:"Dance"},
-  {title:"Blind", artist:"SZA", mood:"Chill / R&B", mp3:"blind.mp3", lyricIndex:3, img:"https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600", plays:78, genre:"R&B"},
-  {title:"Like I Want You", artist:"Giveon", mood:"Love / R&B", mp3:"likeiwantyou.mp3", lyricIndex:4, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:74, genre:"R&B"},
-  {title:"EXO Song", artist:"EXO", mood:"Energetic / K-Pop", mp3:"exosc.mp3", lyricIndex:5, img:"https://images.unsplash.com/photo-1459749411175-04bf6732d85d?w=600", plays:71, genre:"K-Pop"},
-  {title:"Psycho", artist:"Red Velvet", mood:"Pop / K-Pop", mp3:"redvelvetpsyhco.mp3", lyricIndex:6, img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600", plays:69, genre:"K-Pop"},
-  {title:"Sole - Love", artist:"Sole", mood:"Chill / Love", mp3:"solet'slove.mp3", lyricIndex:7, img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600", plays:64, genre:"Chill"},
-  {title:"The First Snow", artist:"EXO", mood:"Winter / Chill", mp3:"thefirstsnow.mp3", lyricIndex:8, img:"https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600", plays:88, genre:"K-Pop"},
+  {title:"Dancing On My Own", artist:"Robyn", mood:"Sad / Dance", mp3:"dancingonmyown.mp3", lyricIndex:3, img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600", plays:85, genre:"Dance"},
+  {title:"Blind", artist:"ENHYPEN", mood:"Chill / R&B", mp3:"blind.mp3", lyricIndex:9, img:"https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600", plays:78, genre:"R&B"},
+  {title:"Like I Want You", artist:"Giveon", mood:"Love / R&B", mp3:"likeiwantyou.mp3", lyricIndex:10, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:74, genre:"R&B"},
+  {title:"Just Us 2", artist:"EXO-SC", mood:"Energetic / K-Pop", mp3:"exosc.mp3", lyricIndex:6, img:"https://images.unsplash.com/photo-1459749411175-04bf6732d85d?w=600", plays:71, genre:"K-Pop"},
+  {title:"Psycho", artist:"Red Velvet", mood:"Pop / K-Pop", mp3:"redvelvetpsyhco.mp3", lyricIndex:7, img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600", plays:69, genre:"K-Pop"},
+  {title:"So Let's Love", artist:"DAY6", mood:"Chill / Love", mp3:"solet'slove.mp3", lyricIndex:8, img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600", plays:64, genre:"Chill"},
+  {title:"The First Snow", artist:"EXO", mood:"Winter / Chill", mp3:"thefirstsnow.mp3", lyricIndex:5, img:"https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600", plays:88, genre:"K-Pop"},
 ];
-
-const songDelays = {
-  0: 4, 1: 2, 2: 5, 3: 6, 4: 3, 5: 7, 6: 8, 7: 4, 8: 9,
-};
 
 let currentIndex = -1;
 let lyricLines = [];
 let lyricEls = [];
+let lyricMode = 'none';
+let lyricOffset = 0;
+let activeLyricIndex = -1;
+const LYRIC_OFFSET_KEY = 'moodify_lyric_offsets';
+let lyricOffsets = JSON.parse(localStorage.getItem(LYRIC_OFFSET_KEY) || '{}');
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateLyricOffsetLabel(){
+  const label = document.getElementById('lyricOffsetLabel');
+  if(!label) return;
+  label.textContent = lyricMode === 'timed'
+    ? 'Sync ' + (lyricOffset > 0 ? '+' : '') + lyricOffset.toFixed(1) + 's'
+    : 'No sync data';
+  document.querySelectorAll('.lyric-offset button').forEach(b => { b.disabled = lyricMode !== 'timed'; });
+}
+
+function updateActiveLyric(){
+  if(lyricMode !== 'timed' || !lyricEls.length) return;
+  const t = audioEl.currentTime + lyricOffset;
+  let idx = 0;
+  for(let k = 0; k < lyricLines.length; k++){
+    if(lyricLines[k].t <= t) idx = k;
+    else break;
+  }
+  if(idx === activeLyricIndex) return;
+  if(activeLyricIndex >= 0 && lyricEls[activeLyricIndex]) lyricEls[activeLyricIndex].classList.remove('active');
+  activeLyricIndex = idx;
+  if(lyricEls[idx]){
+    lyricEls[idx].classList.add('active');
+    lyricEls[idx].scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+function adjustLyricOffset(delta){
+  if(lyricMode !== 'timed') return;
+  lyricOffset = Math.max(-10, Math.min(10, Math.round((lyricOffset + delta) * 10) / 10));
+  lyricOffsets[currentIndex] = lyricOffset;
+  localStorage.setItem(LYRIC_OFFSET_KEY, JSON.stringify(lyricOffsets));
+  updateLyricOffsetLabel();
+  updateActiveLyric();
+}
 let likedSongs = JSON.parse(localStorage.getItem('moodify_liked') || '[]');
 function saveLiked(){ localStorage.setItem('moodify_liked', JSON.stringify(likedSongs)); document.getElementById('likedCount').innerText = likedSongs.length; }
 function isLiked(i){ return likedSongs.includes(i); }
@@ -489,14 +547,37 @@ function playSong(i){
   document.getElementById('npArtist').innerText = next.artist + " • Next";
   document.getElementById('npImg').src = next.img;
   const box = document.getElementById('lyricsBox');
-  const data = window.songLyricsDatabase ? window.songLyricsDatabase[s.lyricIndex] : null;
-  if(data && data.lines){
-    let lines = Array.isArray(data.lines) ? data.lines : data.lines.split("\n");
-    lyricLines = lines.filter(l => l.trim() !== "");
-    box.innerHTML = lyricLines.map((line,idx)=>`<div class="lyric-line" id="line-${idx}">${line}</div>`).join('');
-    lyricEls = [...document.querySelectorAll('.lyric-line')];
+  lyricLines = [];
+  lyricEls = [];
+  lyricMode = 'none';
+  activeLyricIndex = -1;
+
+  const timed = window.timedLyrics ? window.timedLyrics[i] : null;
+  if(timed && Array.isArray(timed.lines) && timed.lines.length){
+    lyricMode = 'timed';
+    lyricLines = timed.lines;
+    lyricOffset = Number(lyricOffsets[i] || 0);
+    updateLyricOffsetLabel();
+    box.innerHTML = lyricLines.map((line, idx)=>
+      `<div class="lyric-line" id="line-${idx}" data-time="${line.t}">${escapeHtml(line.text)}</div>`
+    ).join('');
+    lyricEls = [...box.querySelectorAll('.lyric-line')];
+    updateActiveLyric();
   } else {
-    box.innerHTML = `<div class="lyric-line active">Lyrics not found for index ${s.lyricIndex}.</div>`;
+    const data = window.songLyricsDatabase ? window.songLyricsDatabase[s.lyricIndex] : null;
+    lyricOffset = 0;
+    if(data && data.lines){
+      const lines = Array.isArray(data.lines) ? data.lines : data.lines.split("\n");
+      lyricLines = lines.filter(l => l.trim() !== "");
+      lyricMode = 'plain';
+      box.innerHTML = lyricLines.map((line, idx)=>
+        `<div class="lyric-line${idx === 0 ? ' active' : ''}" id="line-${idx}">${escapeHtml(line)}</div>`
+      ).join('');
+      lyricEls = [...box.querySelectorAll('.lyric-line')];
+    } else {
+      box.innerHTML = `<div class="lyric-line active">Lyrics not available for this song.</div>`;
+    }
+    updateLyricOffsetLabel();
   }
   renderAll();
   updateMiniPlayer();
@@ -517,18 +598,7 @@ audioEl.addEventListener('timeupdate', ()=>{
     let pct = (audioEl.currentTime / audioEl.duration) * 100;
     document.getElementById('miniProgressBar').style.width = pct + "%";
   }
-  if(!lyricLines.length || !audioEl.duration) return;
-  let delay = songDelays[currentIndex] || 5;
-  let effectiveTime = audioEl.currentTime - delay;
-  if(effectiveTime < 0) effectiveTime = 0;
-  let usableDuration = audioEl.duration - delay;
-  if(usableDuration <= 0) usableDuration = audioEl.duration;
-  let perLine = usableDuration / lyricLines.length;
-  let currentLine = Math.floor(effectiveTime / perLine);
-  if(currentLine >= lyricLines.length) currentLine = lyricLines.length - 1;
-  lyricEls.forEach((el, idx)=>{ el.classList.toggle('active', idx === currentLine); });
-  let active = document.getElementById(`line-${currentLine}`);
-  if(active) active.scrollIntoView({behavior:'smooth', block:'center'});
+  if(lyricMode === 'timed') updateActiveLyric();
 });
 audioEl.addEventListener('ended', ()=>{ playNext(); });
 function playNext(){ if(currentIndex===-1) playSong(0); else playSong((currentIndex+1)%mySongs.length); }
