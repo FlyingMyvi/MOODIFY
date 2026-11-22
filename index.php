@@ -707,6 +707,26 @@ unset($track);
     .lcd-progress { flex: 1; }
     .apple-volume { display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: var(--accent-pop); font-size: 13px; }
     .apple-volume input { width: 72px; }
+    .player-notice {
+      position: fixed;
+      left: 50%;
+      bottom: 100px;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-pop);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      max-width: calc(100% - 32px);
+      text-align: center;
+    }
+    .player-notice.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -836,6 +856,8 @@ unset($track);
     <div class="queue-list" id="appleQueueList"></div>
   </aside>
 
+  <div id="playerNotice" class="player-notice"></div>
+
   <!-- FLOATING PLAYER DOCK -->
   <div class="apple-player-dock">
     <div class="apple-controls">
@@ -913,6 +935,16 @@ unset($track);
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
+    let noticeTimer = null;
+    function showNotice(text) {
+      const el = document.getElementById('playerNotice');
+      if (!el) { console.warn(text); return; }
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
     // Event Listeners untuk HTML5 Audio sebenar
     audio.addEventListener('loadedmetadata', () => {
       document.getElementById('totalTime').textContent = formatTime(audio.duration);
@@ -932,7 +964,7 @@ unset($track);
 
     audio.addEventListener('error', () => {
       const t = tracks[currentTrackIndex];
-      alert(`Fail audio "${t.file}" tak dijumpai dalam folder moodify! Pastikan fail MP3 dah dimasukkan.`);
+      showNotice(t ? `"${t.file}" is not available yet.` : 'Audio is not available.');
       isPlaying = false;
       document.getElementById('playPauseBtn').textContent = '▶';
     });
@@ -946,8 +978,13 @@ unset($track);
     }
 
     function loadTrackSource(id, autoPlay = true) {
+      const t = tracks[id];
+      if (!t || !t.exists) {
+        if (t) showNotice(`"${t.title}" has no MP3 yet.`);
+        return;
+      }
+
       currentTrackIndex = id;
-      const t = tracks[currentTrackIndex];
       // Guna encodeURIComponent supaya simbol seperti apostrof dalam solet'slove.mp3 dibaca dengan selamat
       audio.src = encodeURIComponent(t.file);
       updatePlayerDockMeta();
@@ -1031,17 +1068,22 @@ unset($track);
     };
 
     window.selectAndPlayTrack = function(id) {
+      const t = tracks[id];
+      if (!t) return;
+      if (!t.exists) {
+        showNotice(`"${t.title}" has no MP3 yet.`);
+        return;
+      }
       loadTrackSource(id, true);
     };
 
     window.playCurrentGenre = function() {
       const filtered = tracks.filter(t => t.genre === activeGenre && t.exists);
-      if (filtered.length > 0) {
-        loadTrackSource(filtered[0].id, true);
-      } else {
-        const anyInGenre = tracks.filter(t => t.genre === activeGenre);
-        if (anyInGenre.length > 0) loadTrackSource(anyInGenre[0].id, true);
+      if (!filtered.length) {
+        showNotice(`No MP3s in ${activeGenre} yet.`);
+        return;
       }
+      loadTrackSource(filtered[0].id, true);
     };
 
     function updatePlayerDockMeta() {
@@ -1112,7 +1154,7 @@ unset($track);
             <div class="queue-thumb" style="background: ${tr.color}">${tr.emoji}</div>
             <div class="queue-text">
               <h5>${tr.title}</h5>
-              <span>${tr.artist} ${tr.exists ? '• MP3' : ''}</span>
+              <span>${tr.artist} ${tr.exists ? '• MP3' : '• NO MP3'}</span>
             </div>
           </div>
         </div>
@@ -1255,6 +1297,11 @@ unset($track);
 
     window.togglePlay = function() {
       const btn = document.getElementById('playPauseBtn');
+      const t = tracks[currentTrackIndex];
+      if (!t || !t.exists) {
+        showNotice('This track has no MP3 yet.');
+        return;
+      }
       if (audio.paused) {
         audio.play().then(() => {
           isPlaying = true;
@@ -1268,13 +1315,25 @@ unset($track);
     };
 
     window.nextTrack = function() {
-      const nextIdx = (currentTrackIndex + 1) % tracks.length;
-      loadTrackSource(nextIdx, true);
+      for (let i = 1; i <= tracks.length; i++) {
+        const nextIdx = (currentTrackIndex + i) % tracks.length;
+        if (tracks[nextIdx].exists) {
+          loadTrackSource(nextIdx, true);
+          return;
+        }
+      }
+      showNotice('No playable MP3s in the library.');
     };
 
     window.prevTrack = function() {
-      const prevIdx = (currentTrackIndex - 1 + tracks.length) % tracks.length;
-      loadTrackSource(prevIdx, true);
+      for (let i = 1; i <= tracks.length; i++) {
+        const prevIdx = (currentTrackIndex - i + tracks.length) % tracks.length;
+        if (tracks[prevIdx].exists) {
+          loadTrackSource(prevIdx, true);
+          return;
+        }
+      }
+      showNotice('No playable MP3s in the library.');
     };
 
     window.seekTrack = function(val) {
