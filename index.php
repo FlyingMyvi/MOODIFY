@@ -897,7 +897,7 @@ unset($track);
     }
   </style>
 <link rel="stylesheet" href="logo.css" />
-<link rel="stylesheet" href="header.css" />
+<link rel="stylesheet" href="header.css?v=2" />
 </head>
 <body>
 
