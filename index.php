@@ -766,8 +766,8 @@ unset($track);
     <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
 
     <div class="nav-group">
-      <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">🚀 Futuristic Home</div>
-      <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">🎤 MOODIFY Live Lyrics</div>
+      <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">Futuristic Home</div>
+      <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">MOODIFY Live Lyrics</div>
     </div>
 
     <div class="library-section">
@@ -817,7 +817,7 @@ unset($track);
       <div class="genius-split">
         <div class="genius-box">
           <div class="genius-box-header">
-            <strong style="font-size: 13px;">🔥 Trending Top Charts</strong>
+            <strong style="font-size: 13px;">Trending Top Charts</strong>
             <span class="genius-pill">GENIUS CHARTS</span>
           </div>
           <div id="geniusChartList"></div>
@@ -825,7 +825,7 @@ unset($track);
 
         <div class="genius-box">
           <div class="genius-box-header">
-            <strong style="font-size: 13px;" id="annotationTrackTitle">💡 Lyric Meaning & Feedback</strong>
+            <strong style="font-size: 13px;" id="annotationTrackTitle">Lyric Meaning & Feedback</strong>
             <span class="genius-pill">VERIFIED</span>
           </div>
           <div class="annotation-card" id="geniusAnnotationText"></div>
@@ -1256,7 +1256,7 @@ unset($track);
         </div>
       `).join('');
 
-      document.getElementById('annotationTrackTitle').textContent = `💡 ${t.title} — Meaning & Feedback`;
+      document.getElementById('annotationTrackTitle').textContent = `${t.title} — Meaning & Feedback`;
       document.getElementById('geniusAnnotationText').textContent = t.annotation;
       renderFeedbackList();
     }
