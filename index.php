@@ -261,7 +261,7 @@ unset($track);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moodify — SoundSpace Player</title>
+  <title>MOODIFY â€” Music Player</title>
   <style>
     :root {
       --bg-black: #000000;
