@@ -1070,6 +1070,9 @@ unset($track);
         showNotice(`"${track.title}" has no MP3 yet.`);
         return false;
       }
+      if (activeGenre !== track.genre) {
+        window.setGenreFilter(track.genre);
+      }
       loadTrackSource(id, true);
       return true;
     }
