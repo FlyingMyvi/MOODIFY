@@ -266,7 +266,7 @@ unset($track);
   <meta http-equiv="Cache-Control" content="no-store" />
   <meta http-equiv="Pragma" content="no-cache" />
   <title>MOODIFY - Music Player</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Outfit:wght@800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-black: #000000;
@@ -285,7 +285,7 @@ unset($track);
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-family: 'DM Sans', sans-serif;
     }
 
     body {
@@ -333,6 +333,16 @@ unset($track);
       display: flex;
       flex-direction: column;
       gap: 6px;
+    }
+
+    .site-links {
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .site-links .nav-item {
+      padding: 8px 10px;
+      font-size: 12px;
     }
 
     .nav-item {
@@ -506,7 +516,7 @@ unset($track);
       margin-bottom: 8px;
     }
 
-    .futuristic-hero h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .futuristic-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 600; line-height: 1.1; margin-bottom: 4px; }
     .futuristic-hero p { font-size: 12px; color: var(--text-secondary); }
 
     .hero-play-btn {
@@ -552,7 +562,7 @@ unset($track);
       margin: 22px 0 14px;
     }
 
-    .section-header h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.2px; }
+    .section-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
     .section-sub { font-size: 11px; color: var(--accent-pop); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 
     .card-grid {
@@ -790,6 +800,15 @@ unset($track);
       <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">MOODIFY Live Lyrics</div>
     </div>
 
+    <nav class="nav-group site-links" aria-label="Explore MOODIFY">
+      <div class="library-title">Explore</div>
+      <a href="index.html" class="nav-item">Homepage</a>
+      <a href="index.html#charts" class="nav-item">Our Music</a>
+      <a href="video.html" class="nav-item">Video Theater</a>
+      <a href="feedback.html" class="nav-item">Feedback</a>
+      <a href="index.html#team" class="nav-item">Team</a>
+    </nav>
+
     <div class="library-section">
       <div class="library-title">Playlists by Genre</div>
       <div id="sidebarLibrary"></div>
@@ -986,25 +1005,73 @@ unset($track);
       1781316886
     ];
 
+    function fetchItunesJsonp(url, timeout = 10000) {
+      return new Promise((resolve, reject) => {
+        const callbackName =
+          'moodifyItunes_' +
+          Date.now() +
+          '_' +
+          Math.floor(Math.random() * 1000000);
+
+        const separator = url.includes('?') ? '&' : '?';
+        const script = document.createElement('script');
+        let timer = null;
+        let settled = false;
+
+        function cleanup() {
+          if (timer) clearTimeout(timer);
+
+          try {
+            delete window[callbackName];
+          } catch (error) {
+            window[callbackName] = undefined;
+          }
+
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        function finish(callback, value) {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          callback(value);
+        }
+
+        window[callbackName] = (data) => finish(resolve, data);
+
+        script.onerror = () => finish(
+          reject,
+          new Error('iTunes JSONP request failed')
+        );
+
+        script.onload = () => {
+          if (!settled) {
+            finish(reject, new Error('iTunes JSONP returned no data'));
+          }
+        };
+
+        timer = setTimeout(
+          () => finish(reject, new Error('iTunes JSONP request timed out')),
+          timeout
+        );
+
+        script.async = true;
+        script.src =
+          url +
+          separator +
+          'callback=' +
+          encodeURIComponent(callbackName);
+
+        document.body.appendChild(script);
+      });
+    }
+
     async function fetchItunesLookup(ids) {
-      const url =
+      return fetchItunesJsonp(
         'https://itunes.apple.com/lookup?id=' +
         ids.join(',') +
-        '&country=MY';
-
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const response = await fetch(url);
-
-        if (response.ok) {
-          return await response.json();
-        }
-
-        if (attempt === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 1200));
-        }
-      }
-
-      throw new Error('iTunes lookup failed');
+        '&country=MY'
+      );
     }
 
     async function loadItunesArtwork() {

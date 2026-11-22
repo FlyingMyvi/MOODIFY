@@ -515,6 +515,14 @@ nav {
     padding: 14px 16px;
 }
 
+.receipt .receipt-wide {
+    grid-column: 1 / -1;
+}
+
+.receipt dd.message-value {
+    white-space: pre-wrap;
+}
+
 .receipt dt {
     color: var(--muted);
     font-size: 9px;
@@ -795,8 +803,8 @@ footer p {
                 <a href="index.html">HOME</a>
                 <a href="index.html#featured">FEATURED</a>
                 <a href="index.html#charts">OUR MUSIC</a>
-                <a href="player.html?v=11#lyrics">LYRICS</a>
-                <a href="player.html?v=11">AUDIO</a>
+                <a href="player.html?v=12#lyrics">LYRICS</a>
+                <a href="player.html?v=12">AUDIO</a>
                 <a href="video.html">VIDEO</a>
                 <a href="feedback.html" class="active" aria-current="page">FEEDBACK</a>
                 <a href="index.html#team">TEAM</a>
@@ -966,16 +974,32 @@ footer p {
 
                 <dl class="receipt">
                     <div>
-                        <dt>Reference</dt>
-                        <dd id="successRef"></dd>
+                        <dt>Name</dt>
+                        <dd id="successReceiptName"></dd>
+                    </div>
+                    <div>
+                        <dt>Gender</dt>
+                        <dd id="successGender"></dd>
+                    </div>
+                    <div>
+                        <dt>Email</dt>
+                        <dd id="successEmail"></dd>
                     </div>
                     <div>
                         <dt>Type</dt>
                         <dd id="successType"></dd>
                     </div>
+                    <div class="receipt-wide">
+                        <dt>Feedback</dt>
+                        <dd id="successMessage" class="message-value"></dd>
+                    </div>
                     <div>
                         <dt>Date &amp; Time</dt>
                         <dd id="successDate"></dd>
+                    </div>
+                    <div>
+                        <dt>Reference</dt>
+                        <dd id="successRef"></dd>
                     </div>
                     <div>
                         <dt>Storage</dt>
@@ -1046,8 +1070,8 @@ footer p {
             <a href="index.html#charts">Our Music</a>
             <a href="index.html#artists">Artists</a>
             <a href="index.html#team">Team</a>
-            <a href="player.html?v=11#lyrics">Lyrics</a>
-            <a href="player.html?v=11">Audio</a>
+            <a href="player.html?v=12#lyrics">Lyrics</a>
+            <a href="player.html?v=12">Audio</a>
             <a href="video.html">Video</a>
             <a href="feedback.html">Feedback</a>
         </div>
@@ -1073,8 +1097,12 @@ footer p {
     const charCount = document.getElementById('charCount');
     const dateTimeInput = document.getElementById('dateTime');
     const successName = document.getElementById('successName');
+    const successReceiptName = document.getElementById('successReceiptName');
+    const successGender = document.getElementById('successGender');
+    const successEmail = document.getElementById('successEmail');
     const successRef = document.getElementById('successRef');
     const successType = document.getElementById('successType');
+    const successMessage = document.getElementById('successMessage');
     const successDate = document.getElementById('successDate');
     const successStorage = document.getElementById('successStorage');
 
@@ -1278,8 +1306,12 @@ footer p {
         form.hidden = true;
         successPanel.hidden = false;
         successName.textContent = payload.name;
+        successReceiptName.textContent = payload.name;
+        successGender.textContent = payload.gender;
+        successEmail.textContent = payload.email;
         successRef.textContent = result.reference;
         successType.textContent = payload.type;
+        successMessage.textContent = payload.message;
         successDate.textContent = formatDateTime(new Date(result.submittedAt || payload.submittedAt));
         successStorage.textContent = result.storage;
         successPanel.focus();
