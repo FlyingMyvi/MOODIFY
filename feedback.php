@@ -60,7 +60,7 @@ $email = text_field($input, 'email', 120);
 $type = text_field($input, 'type', 40);
 $message = text_field($input, 'message', 1500);
 
-$allowedGenders = ['Female', 'Male', 'Non-binary', 'Prefer not to say'];
+$allowedGenders = ['Female', 'Male'];
 $allowedTypes = ['Suggestion', 'Complaint', 'Enquiry'];
 
 $errors = [];
