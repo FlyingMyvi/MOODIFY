@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOODIFY</title>
+<script src="lyrics.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#121110;--dark:#1C1A17;--cream:#F5F1E8;--beige:#E8DFD0;--leopard:#C4B49A;--brown:#8A7A64;--line:#E2D9C6}
+body{background:var(--black);color:#fff;font-family:'Inter Tight',sans-serif;overflow-x:hidden}
+body.playing header{top:72px}
+a{text-decoration:none;color:inherit}
+
+/* ===== DYNAMIC ISLAND - MINI PLAYER ATAS TENGAH ===== */
+#miniPlayer{
+position:fixed;top:8px;left:50%;transform:translateX(-50%) scale(.9);z-index:300;
+width:340px;max-width:calc(100% - 24px);
+background:#000;border:1px solid #33302A;border-radius:999px;
+display:none;align-items:center;gap:10px;padding:6px 6px 6px 8px;
+box-shadow:0 10px 30px rgba(0,0,0,.7);cursor:pointer;
+transition:.3s;
+}
+#miniPlayer.show{display:flex;transform:translateX(-50%) scale(1);animation:pop .35s ease}
+@keyframes pop{0%{transform:translateX(-50%) scale(.7);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+#miniPlayer img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #C4B49A;flex-shrink:0}
+#miniPlayer .mini-info{flex:1;min-width:0;text-align:left}
+#miniPlayer .mini-info b{font-family:'Archivo',sans-serif;font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#miniPlayer .mini-info span{font-size:11px;color:#999;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#miniPlayer .mini-btn{width:36px;height:36px;border-radius:50%;border:0;background:#F5F1E8;color:#000;font-size:14px;cursor:pointer;flex-shrink:0;font-weight:900}
+#miniPlayer .mini-next{width:32px;height:32px;border-radius:50%;border:1px solid #444;background:transparent;color:#fff;font-size:12px;cursor:pointer;flex-shrink:0}
+#miniPlayer .mini-progress{position:absolute;left:20px;right:20px;bottom:3px;height:2px;background:#333;border-radius:999px;overflow:hidden}
+#miniPlayer .mini-progress-bar{height:100%;background:#C4B49A;width:0%}
+#miniPlayer .eq{display:flex;gap:2px;align-items:end;height:14px;flex-shrink:0}
+#miniPlayer .eq span{width:3px;background:#C4B49A;border-radius:2px;animation:eq 0.8s ease-in-out infinite}
+#miniPlayer .eq span:nth-child(2){animation-delay:.2s}
+#miniPlayer .eq span:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+#miniPlayer.paused .eq span{animation-play-state:paused;height:4px}
+
+/* LEOPARD TEXTURE */
+.leopard-texture{
+background-color:#E8DFD0;
+background-image:
+radial-gradient(ellipse 18px 13px at 12% 22%, rgba(60,50,38,.22) 0 45%, transparent 46%),
+radial-gradient(ellipse 10px 8px at 18% 16%, rgba(60,50,38,.18) 0 45%, transparent 46%),
+radial-gradient(ellipse 16px 12px at 68% 18%, rgba(60,50,38,.20) 0 45%, transparent 46%),
+radial-gradient(ellipse 9px 7px at 76% 24%, rgba(60,50,38,.15) 0 45%, transparent 46%),
+radial-gradient(ellipse 20px 14px at 42% 52%, rgba(60,50,38,.22) 0 45%, transparent 46%),
+radial-gradient(ellipse 11px 8px at 52% 46%, rgba(60,50,38,.16) 0 45%, transparent 46%),
+radial-gradient(ellipse 17px 12px at 14% 72%, rgba(60,50,38,.20) 0 45%, transparent 46%),
+radial-gradient(ellipse 10px 8px at 88% 68%, rgba(60,50,38,.16) 0 45%, transparent 46%),
+radial-gradient(ellipse 19px 13px at 62% 84%, rgba(60,50,38,.20) 0 45%, transparent 46%),
+radial-gradient(ellipse 10px 8px at 32% 88%, rgba(60,50,38,.15) 0 45%, transparent 46%);
+}
+.leopard-line{height:6px;background-color:#E8DFD0;background-image:radial-gradient(ellipse 10px 7px at 15% 50%, rgba(60,50,38,.25) 0 45%, transparent 46%),radial-gradient(ellipse 8px 6px at 45% 50%, rgba(60,50,38,.2) 0 45%, transparent 46%),radial-gradient(ellipse 11px 7px at 75% 50%, rgba(60,50,38,.22) 0 45%, transparent 46%);border-top:1px solid #D8CDB8;border-bottom:1px solid #D8CDB8}
+
+/* HEADER */
+header{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:1280px;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:14px;background:#1C1A17;border:1px solid #33302A;transition:top .3s}
+.logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:2px;line-height:1}.logo span{color:var(--leopard)}.logo small{display:block;font-family:'Inter Tight',sans-serif;font-size:9px;letter-spacing:4px;color:#999;font-weight:700}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;border:0;color:#BBB;padding:9px 13px;border-radius:10px;font-weight:700;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+nav button.active,nav button:hover{background:#F5F1E8;color:#000}
+
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+.wrap{max-width:1280px;margin:auto;padding:100px 20px 40px}
+body.playing .wrap{padding-top:155px}
+
+/* HERO */
+.hero{position:relative;border-radius:20px;overflow:hidden;background:#1C1A17;border:1px solid #33302A;display:grid;grid-template-columns:1.15fr .85fr;min-height:480px}
+.hero-left{padding:44px 36px}
+.hero-left .badge{font-family:'Archivo',sans-serif;font-size:11px;letter-spacing:3px;font-weight:800;color:var(--leopard);border:1px solid #44403A;display:inline-block;padding:7px 12px;border-radius:999px}
+.hero-left h1{font-family:'Anton',sans-serif;font-size:76px;line-height:.92;letter-spacing:1px;margin:16px 0;text-transform:uppercase;color:#fff}
+.hero-left h1 .beat{color:#fff;-webkit-text-stroke:1.5px #fff;background:none;-webkit-text-fill-color:#fff}
+.hero-left h1 .beat2{color:transparent;-webkit-text-stroke:1.5px var(--leopard)}
+.hero-left p{color:#B8B2A5;font-size:16px;line-height:1.6;max-width:520px;font-weight:500}
+.hero-stats{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.hero-stats div{background:#121110;border:1px solid #33302A;padding:12px 16px;border-radius:12px}
+.hero-stats b{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;display:block}
+.hero-stats span{font-size:11px;color:#888;letter-spacing:1px;font-weight:700;text-transform:uppercase}
+.hero-btns{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+.btn-dark{background:#F5F1E8;color:#000;padding:14px 22px;border-radius:12px;font-weight:800;border:0;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.5px}
+.btn-outline{background:transparent;color:#fff;padding:14px 22px;border-radius:12px;font-weight:800;border:1px solid #555;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px}
+.hero-right{position:relative;overflow:hidden}
+.hero-right img{width:100%;height:100%;object-fit:cover;min-height:320px}
+.hero-right::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#1C1A17 0%,transparent 28%)}
+.hero-right .caption{position:absolute;left:16px;bottom:16px;z-index:2;background:rgba(0,0,0,.65);padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;letter-spacing:1px}
+
+/* SECTIONS */
+.section-cream{background:var(--cream);color:#111;border-radius:20px;padding:30px;margin-top:20px}
+.section-black{background:#1C1A17;border:1px solid #33302A;border-radius:20px;padding:30px;margin-top:20px}
+.section-leopard{border-radius:20px;padding:30px;margin-top:20px;border:1px solid #D8CDB8;color:#111}
+.section-title{font-family:'Anton',sans-serif;font-size:36px;letter-spacing:1px;line-height:1;text-transform:uppercase}
+.section-title span{color:var(--brown)}
+.section-sub{color:#888;margin:8px 0 18px;font-size:14px;font-weight:500}
+.section-cream .section-sub,.section-leopard .section-sub{color:#6B6252}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:#24211D;border:1px solid #33302A;border-radius:18px;overflow:hidden;cursor:pointer;position:relative;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--leopard)}
+.section-cream .card,.section-leopard .card{background:#fff;border:1px solid #E2D9C6;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.card img{width:100%;height:175px;object-fit:cover}
+.card-body{padding:16px}.card-body h3{font-family:'Archivo',sans-serif;font-size:19px;font-weight:800;line-height:1.1}.card-body p{color:#A39E90;font-size:13px;margin:6px 0 12px;line-height:1.5}
+.section-cream .card-body p,.section-leopard .card-body p{color:#777}
+.play-mini{background:#111;color:#fff;border:0;padding:9px 16px;border-radius:10px;font-weight:800;cursor:pointer;font-family:'Archivo',sans-serif;font-size:12px}
+.heart-btn{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:18px;cursor:pointer;z-index:5}
+.heart-btn.liked{background:#fff;color:#000}
+.rank-badge{position:absolute;top:12px;left:12px;background:#fff;color:#000;padding:6px 10px;border-radius:8px;font-weight:800;font-size:11px;letter-spacing:1px;font-family:'Archivo',sans-serif}
+.pos{font-family:'Anton',sans-serif;font-size:15px;background:#111;color:#F5F1E8;padding:4px 10px;border-radius:8px;letter-spacing:1px}
+
+.top3{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:12px;align-items:end;margin:16px 0}
+@media(max-width:900px){.top3{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-left h1{font-size:52px}}
+.top3-card{background:#111;border:1px solid #33302A;border-radius:16px;padding:14px;text-align:center;cursor:pointer}
+.top3-card img{width:100%;height:90px;object-fit:cover;border-radius:10px}
+.top3-card h4{font-family:'Archivo',sans-serif;font-size:16px;margin:8px 0 2px}.top3-card p{font-size:12px;color:#999}
+.top3-card.first{border-color:var(--leopard);background:#F5F1E8;color:#111}
+.top3-card.first p{color:#777}
+.top3-bar{height:6px;background:var(--leopard);border-radius:999px;margin-top:8px}
+.chart-box{background:#111;border:1px solid #33302A;border-radius:16px;padding:16px}
+.chart-row{display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer;padding:8px;border-radius:12px}
+.chart-row:hover{background:#222}
+.chart-row .num{font-family:'Anton',sans-serif;font-size:24px;width:40px;color:var(--leopard)}
+.chart-row img{width:54px;height:54px;border-radius:10px;object-fit:cover}
+.chart-row .info{flex:1}.chart-row .info b{font-family:'Archivo',sans-serif;font-size:16px}.chart-row .info p{font-size:12px;color:#999}
+.bar-wrap{flex:1.2;height:8px;background:#333;border-radius:999px;overflow:hidden;min-width:70px}
+.bar{height:100%;background:linear-gradient(90deg,#fff,#C4B49A);border-radius:999px}
+.pct{font-family:'Anton',sans-serif;font-size:16px;width:48px;text-align:right;color:#E8DFD0}
+
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.about-grid{grid-template-columns:1fr}}
+.about-card{background:#111;border:1px solid #33302A;border-radius:18px;padding:22px}
+.section-cream .about-card,.section-leopard .about-card{background:#fff;border:1px solid #E2D9C6}
+.about-card h3{font-family:'Archivo',sans-serif;font-size:22px;margin-bottom:8px}.about-card p{color:#aaa;line-height:1.6;font-size:14px}
+.section-cream .about-card p,.section-leopard .about-card p{color:#555}
+.member-mini{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.member-mini span{background:#111;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+
+.two-col{display:grid;grid-template-columns:1fr 350px;gap:16px;align-items:start}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+.queue-box{background:#F5F1E8;color:#111;border-radius:20px;padding:16px;position:sticky;top:155px}
+.queue-box h3{font-family:'Anton',sans-serif;font-size:17px;letter-spacing:1px;margin-bottom:10px}
+.next-playing{background:#111;color:#fff;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.next-playing img{width:52px;height:52px;border-radius:10px;object-fit:cover}
+.q-item{display:flex;gap:12px;align-items:center;padding:8px;border-radius:12px;cursor:pointer;color:#111}
+.q-item:hover,.q-item.active{background:#E8DFD0}
+.q-item img{width:46px;height:46px;border-radius:8px;object-fit:cover}.q-item b{font-family:'Archivo',sans-serif;font-size:14px}.q-item p{font-size:12px;color:#777}
+
+.player{background:#F5F1E8;color:#111;border-radius:20px;padding:20px}
+.player-top{display:flex;gap:14px;align-items:center}
+.player-top img{width:90px;height:90px;border-radius:14px;object-fit:cover}
+.player-top h2{font-family:'Archivo',sans-serif;font-size:26px;font-weight:800}.player-top p{font-family:'Archivo',sans-serif;font-size:12px;font-weight:800;color:#8A7A64;letter-spacing:1px}
+audio{width:100%;margin:12px 0}
+.lyrics-box{background:#111;border-radius:16px;padding:20px;max-height:430px;overflow:auto;margin-top:10px}
+.lyrics-box h3{color:#E8DFD0;font-size:12px;letter-spacing:3px;margin-bottom:10px;font-family:'Archivo',sans-serif}
+.lyric-line{font-family:'Inter Tight',sans-serif;font-size:21px;font-weight:700;line-height:1.4;color:#666;padding:5px 0;transition:.25s}
+.lyric-line.active{color:#fff;transform:translateX(4px)}
+
+form{background:#F5F1E8;color:#111;padding:20px;border-radius:20px}
+label{display:block;margin:10px 0 4px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:800;letter-spacing:.5px}
+input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #DDD;background:#fff;color:#111;font-family:'Inter Tight',sans-serif;font-size:14px}
+.member{background:#24211D;border:1px solid #33302A;border-radius:18px;padding:16px;text-align:center}
+.member img{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--leopard)}
+.member h3{font-family:'Archivo',sans-serif}.member p{font-size:13px;color:#999}
+.reco-tag{background:#E8DFD0;color:#6B6252;border:1px solid #D8CDB8;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;display:inline-block;margin:3px 3px 0 0}
+footer{text-align:center;padding:26px;color:#888}
+footer a{color:#E8DFD0;margin:0 8px;font-family:'Archivo',sans-serif;font-size:12px;font-weight:800}
+</style>
+</head>
+<body>
+
+<!-- DYNAMIC ISLAND MINI PLAYER -->
+<div id="miniPlayer" onclick="openMiniPlayer(event)">
+  <img id="miniImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200">
+  <div class="mini-info"><b id="miniTitle">Pick a song</b><span id="miniArtist">MOODIFY</span></div>
+  <div class="eq"><span></span><span></span><span></span></div>
+  <button class="mini-next" onclick="miniNext(event)">⏭</button>
+  <button class="mini-btn" id="miniPlayBtn" onclick="toggleMiniPlay(event)">⏸</button>
+  <div class="mini-progress"><div class="mini-progress-bar" id="miniProgressBar"></div></div>
+</div>
+
+<header>
+<div class="logo">MOOD<span>IFY</span><small>MUSIC BY MOOD</small></div>
+<nav>
+<button class="active" onclick="showPage('home',this)">Home</button>
+<button onclick="showPage('songs',this)">Songs</button>
+<button onclick="showPage('liked',this)">Liked (<span id="likedCount">0</span>)</button>
+<button onclick="showPage('reco',this)">Recommendation</button>
+<button onclick="showPage('nowplaying',this)">Now Playing</button>
+<button onclick="showPage('feedback',this)">Feedback</button>
+<button onclick="showPage('about',this)">About Us</button>
+</nav>
+</header>
+
+<div id="page-home" class="page active"><div class="wrap">
+  <div class="hero">
+    <div class="hero-left">
+      <span class="badge">MOODIFY • MUSIC BY MOOD</span>
+      <h1>Feel The<br><span class="beat">Beat.</span><br><span class="beat2">Own Your Mood.</span></h1>
+      <p>Music that matches how you feel. Happy, sad, love, chill — pick your mood, press play, and let the lyrics move with the song.</p>
+      <div class="hero-stats">
+        <div><b>09</b><span>Songs</span></div>
+        <div><b>Top 5</b><span>Most Played</span></div>
+        <div><b>Live</b><span>Lyrics Sync</span></div>
+      </div>
+      <div class="hero-btns">
+        <button class="btn-dark" onclick="showPage('songs')">▶ Explore Songs</button>
+        <button class="btn-outline" onclick="showPage('liked')">❤️ My Liked Songs</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=900" alt="Concert">
+      <div class="caption">LIVE MUSIC • MOODIFY</div>
+    </div>
+  </div>
+  <div class="leopard-line" style="margin-top:16px;border-radius:999px"></div>
+
+  <div class="section-cream">
+    <h2 class="section-title">Most Popular <span>This Week</span></h2>
+    <p class="section-sub">The songs everyone is playing right now. Tap the heart to save to Liked.</p>
+    <div class="grid" id="homeGrid"></div>
+  </div>
+
+  <div class="section-leopard leopard-texture">
+    <h2 class="section-title">Recommended <span>For You</span></h2>
+    <p class="section-sub">Like a song first, we will recommend songs with a similar mood for you.</p>
+    <div class="grid" id="recoHomeGrid"></div>
+  </div>
+
+  <div class="section-cream">
+    <h2 class="section-title">Top Chart <span>• Top 5</span></h2>
+    <p class="section-sub">Ranked by plays in MOODIFY. The top song is in the middle.</p>
+    <div class="top3" id="top3Box"></div>
+    <div class="chart-box" id="chartBox"></div>
+  </div>
+
+  <div class="section-black">
+    <h2 class="section-title">Browse By <span>Mood</span></h2>
+    <p class="section-sub">Choose how you feel today, we will find the music for it.</p>
+    <div class="grid">
+      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600"><div class="card-body"><h3>Love</h3><p>I Think He Knows, Like I Want You — soft, warm, romantic songs.</p><button class="play-mini">Open →</button></div></div>
+      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600"><div class="card-body"><h3>Sad</h3><p>Dancing On My Own, Blind — songs for quiet nights and slow feelings.</p><button class="play-mini">Open →</button></div></div>
+      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600"><div class="card-body"><h3>Energetic</h3><p>EXO, Psycho — high energy songs to lift your mood up.</p><button class="play-mini">Open →</button></div></div>
+      <div class="card" onclick="showPage('songs')"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600"><div class="card-body"><h3>Chill</h3><p>The First Snow, Sole — calm songs for relaxing and studying.</p><button class="play-mini">Open →</button></div></div>
+    </div>
+  </div>
+
+  <div class="section-leopard leopard-texture">
+    <h2 class="section-title">About <span>Us</span></h2>
+    <div class="about-grid">
+      <div class="about-card"><h3>We Are MOODIFY</h3><p>MOODIFY is our group project for Introduction to Web Development. We wanted a music website that is simple — listen by mood, like songs you love, get recommendations, and read lyrics that move with the song.</p><div class="member-mini"><span>Member 1</span><span>Member 2</span><span>Member 3</span><span>Member 4</span><span>Member 5</span></div><button class="btn-dark" style="margin-top:14px;background:#111;color:#fff" onclick="showPage('about')">Meet The Team →</button></div>
+      <div class="about-card"><h3>Why MOODIFY?</h3><p>Music by mood, not by random list. Liked Songs saved for you. Recommendations based on what you like. Lyrics that sync with the song. Fast, clean, no login needed.</p><p style="margin-top:10px;color:#111"><b>Group:</b> MOODIFY | <b>Course:</b> CMPF123</p></div>
+    </div>
+  </div>
+</div></div>
+
+<div id="page-songs" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">All Songs <span style="color:var(--leopard)">+ Up Next</span></h2>
+  <p class="section-sub" style="color:#999">Tap the heart to save to Liked. Tap a card to play the song.</p>
+  <div class="leopard-line" style="margin:12px 0;border-radius:999px"></div>
+  <div class="two-col">
+    <div class="grid" id="songGrid"></div>
+    <div class="queue-box">
+      <h3>Next Playing</h3>
+      <div class="next-playing"><img id="npImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200"><div><b id="npTitle" style="font-family:'Archivo',sans-serif">Pick a song first</b><p id="npArtist">MOODIFY</p></div></div>
+      <h3>Up Next In Queue</h3><div id="queueList"></div>
+      <button class="btn-dark" style="width:100%;margin-top:12px;background:#111;color:#fff" onclick="playNext()">▶ Play Next In Queue</button>
+    </div>
+  </div>
+</div></div>
+
+<div id="page-liked" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Liked Songs</h2>
+  <p class="section-sub" id="likedSub" style="color:#999">Songs you liked will stay here even after refresh.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+    <button class="btn-dark" onclick="playAllLiked()">▶ Play All Liked</button>
+    <button class="btn-outline" onclick="clearLiked()">Clear Liked</button>
+    <button class="btn-outline" onclick="showPage('reco')">See Recommendation →</button>
+  </div>
+  <div class="grid" id="likedGrid"></div>
+  <div id="likedEmpty" style="display:none;background:#1C1A17;padding:26px;border-radius:18px;text-align:center;border:1px solid #33302A"><p style="color:#B8B2A5">You haven't liked any song yet. Go to Songs page and tap the heart on any song.</p></div>
+</div></div>
+
+<div id="page-reco" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Playlist Recommendation</h2>
+  <p class="section-sub" id="recoSub" style="color:#999">Based on your Liked Songs and what you are playing now.</p>
+  <div class="section-cream" style="margin-top:0" id="recoReasonBox">Like a song to unlock recommendations based on your taste.</div>
+  <h3 style="font-family:'Archivo',sans-serif;margin:20px 0 12px">Recommended Playlist For You</h3>
+  <div class="grid" id="recoGrid"></div>
+  <h3 style="font-family:'Archivo',sans-serif;margin:24px 0 12px">More Songs With A Similar Mood</h3>
+  <div class="grid" id="recoMoodGrid"></div>
+</div></div>
+
+<div id="page-nowplaying" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Now Playing + Lyrics</h2>
+  <div class="two-col" style="margin-top:14px">
+    <div class="player">
+      <div class="player-top">
+        <img id="mainImg" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400">
+        <div><p id="nowArtist2">MOODIFY</p><h2 id="nowTitle2">Pick a song first</h2><p style="color:#777;font-size:14px" id="nowMood">Tap Play on Songs page</p>
+        <div style="margin-top:10px"><button class="btn-dark" style="background:#111;color:#fff" id="nowLikeBtn" onclick="toggleLike(currentIndex)">Like This Song</button></div></div>
+      </div>
+      <audio id="mainAudio" controls></audio>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-dark" style="background:#111;color:#fff" onclick="playPrev()">Prev</button>
+        <button class="btn-dark" style="background:#111;color:#fff" onclick="playNext()">Next</button>
+        <button class="btn-outline" style="color:#111;border-color:#DDD" onclick="showPage('songs')">Back to Songs</button>
+      </div>
+      <div class="lyrics-box"><h3>Lyrics • Synced</h3><div id="lyricsBox"><div class="lyric-line active">Tap any song, lyrics will show here and move with the song...</div></div></div>
+      <div style="margin-top:16px"><h3 style="font-family:'Archivo',sans-serif;color:#111;margin-bottom:10px">Because You Are Playing This</h3><div class="grid" id="nowRecoGrid"></div></div>
+    </div>
+    <div class="queue-box"><h3>Up Next In Queue</h3><div id="queueList2"></div></div>
+  </div>
+</div></div>
+
+<div id="page-feedback" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">Give Us Feedback</h2>
+  <p class="section-sub" style="color:#999">Tell us what you think about the music and the website.</p>
+  <form onsubmit="return validateForm()">
+    <label>Name *</label><input id="name" placeholder="Full name">
+    <label>Gender *</label><select id="gender"><option value="">-- Select --</option><option>Male</option><option>Female</option><option>Other</option></select>
+    <label>Email *</label><input id="email" placeholder="example@gmail.com">
+    <label>Type *</label><select id="type"><option value="">-- Select --</option><option>Suggestion</option><option>Complaint</option><option>Enquiry</option></select>
+    <label>Feedback *</label><textarea id="feedback" rows="4" placeholder="Write here..."></textarea>
+    <label>Date & Time</label><input id="datetime" readonly>
+    <button class="btn-dark" style="margin-top:14px;background:#111;color:#fff" type="submit">Submit Feedback</button>
+  </form>
+  <div id="output" style="display:none;background:#fff;color:#111;padding:18px;border-radius:14px;margin-top:16px;border:1px solid #DDD"></div>
+</div></div>
+
+<div id="page-about" class="page"><div class="wrap">
+  <h2 class="section-title" style="font-family:'Anton',sans-serif;font-size:36px">About Our Group</h2>
+  <p style="color:#aaa;margin:10px 0"><b>Group: MOODIFY</b> | CMPF123 - Introduction to Web Development</p>
+  <p style="color:#aaa;margin-bottom:18px">We are a group of students who love music. MOODIFY is our project to make listening to music easier — just pick a mood and play.</p>
+  <div class="grid">
+    <div class="member"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"><h3>Member 1 Name</h3><p>ID: XXXXXXXX</p></div>
+    <div class="member"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300"><h3>Member 2 Name</h3><p>ID: XXXXXXXX</p></div>
+    <div class="member"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300"><h3>Member 3 Name</h3><p>ID: XXXXXXXX</p></div>
+    <div class="member"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300"><h3>Member 4 Name</h3><p>ID: XXXXXXXX</p></div>
+    <div class="member"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300"><h3>Member 5 Name</h3><p>ID: XXXXXXXX</p></div>
+  </div>
+</div></div>
+
+<footer><p style="font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px">MOODIFY © 2026</p><br><a href="https://www.instagram.com/" target="_blank">Instagram</a><a href="https://www.tiktok.com/" target="_blank">TikTok</a><a href="https://www.youtube.com/" target="_blank">YouTube</a><a href="mailto:moodify@gmail.com">moodify@gmail.com</a></footer>
+
+<script>
+const mySongs = [
+  {title:"As It Was", artist:"Harry Styles", mood:"Happy / Pop", mp3:"asitwas.mp3", lyricIndex:0, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:98, genre:"Pop"},
+  {title:"I Think He Knows", artist:"Taylor Swift", mood:"Love / Pop", mp3:"ithinkheknows.mp3", lyricIndex:1, img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600", plays:92, genre:"Pop"},
+  {title:"Dancing On My Own", artist:"Robyn", mood:"Sad / Dance", mp3:"dancingonmyown.mp3", lyricIndex:2, img:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600", plays:85, genre:"Dance"},
+  {title:"Blind", artist:"SZA", mood:"Chill / R&B", mp3:"blind.mp3", lyricIndex:3, img:"https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600", plays:78, genre:"R&B"},
+  {title:"Like I Want You", artist:"Giveon", mood:"Love / R&B", mp3:"likeiwantyou.mp3", lyricIndex:4, img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600", plays:74, genre:"R&B"},
+  {title:"EXO Song", artist:"EXO", mood:"Energetic / K-Pop", mp3:"exosc.mp3", lyricIndex:5, img:"https://images.unsplash.com/photo-1459749411175-04bf6732d85d?w=600", plays:71, genre:"K-Pop"},
+  {title:"Psycho", artist:"Red Velvet", mood:"Pop / K-Pop", mp3:"redvelvetpsyhco.mp3", lyricIndex:6, img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600", plays:69, genre:"K-Pop"},
+  {title:"Sole - Love", artist:"Sole", mood:"Chill / Love", mp3:"solet'slove.mp3", lyricIndex:7, img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600", plays:64, genre:"Chill"},
+  {title:"The First Snow", artist:"EXO", mood:"Winter / Chill", mp3:"thefirstsnow.mp3", lyricIndex:8, img:"https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600", plays:88, genre:"K-Pop"},
+];
+
+const songDelays = {
+  0: 4, 1: 2, 2: 5, 3: 6, 4: 3, 5: 7, 6: 8, 7: 4, 8: 9,
+};
+
+let currentIndex = -1;
+let lyricLines = [];
+let lyricEls = [];
+let likedSongs = JSON.parse(localStorage.getItem('moodify_liked') || '[]');
+function saveLiked(){ localStorage.setItem('moodify_liked', JSON.stringify(likedSongs)); document.getElementById('likedCount').innerText = likedSongs.length; }
+function isLiked(i){ return likedSongs.includes(i); }
+function toggleLike(i, event){
+  if(event) event.stopPropagation();
+  if(i===-1 || i===null) return alert("Play a song first!");
+  if(isLiked(i)){ likedSongs = likedSongs.filter(x=>x!==i); } else { likedSongs.push(i); }
+  saveLiked(); renderAll();
+  let btn = document.getElementById('nowLikeBtn');
+  if(btn) btn.innerText = isLiked(currentIndex) ? "Liked!" : "Like This Song";
+}
+function clearLiked(){ if(!confirm("Clear all liked songs?")) return; likedSongs=[]; saveLiked(); renderAll(); }
+function playAllLiked(){ if(!likedSongs.length) return alert("Like a song first!"); playSong(likedSongs[0]); }
+
+// ===== DYNAMIC ISLAND FUNCTIONS =====
+function updateMiniPlayer(){
+  let mini = document.getElementById('miniPlayer');
+  if(currentIndex === -1){ mini.classList.remove('show'); document.body.classList.remove('playing'); return; }
+  let s = mySongs[currentIndex];
+  mini.classList.add('show');
+  document.body.classList.add('playing');
+  document.getElementById('miniImg').src = s.img;
+  document.getElementById('miniTitle').innerText = s.title;
+  document.getElementById('miniArtist').innerText = s.artist;
+}
+function openMiniPlayer(e){
+  // Kalau tekan butang, jangan buka page - butang tu handle sendiri
+  if(e.target.closest('button')) return;
+  showPage('nowplaying');
+}
+function toggleMiniPlay(e){
+  e.stopPropagation();
+  let audio = document.getElementById('mainAudio');
+  if(audio.paused){ audio.play(); } else { audio.pause(); }
+}
+function miniNext(e){
+  e.stopPropagation();
+  playNext();
+}
+function getRecommendations(){
+  if(!likedSongs.length && currentIndex===-1){
+    return {list:[...mySongs].sort((a,b)=>b.plays-a.plays).slice(0,4), reason:"Top songs in MOODIFY — like a song to get recommendations based on your taste."};
+  }
+  let baseIdx = likedSongs.length ? likedSongs : [currentIndex];
+  let baseMoods = baseIdx.map(i=>mySongs[i].mood);
+  let baseGenres = baseIdx.map(i=>mySongs[i].genre);
+  let baseArtists = baseIdx.map(i=>mySongs[i].artist);
+  let scored = mySongs.map((s,i)=>{
+    let score = s.plays * 0.3;
+    if(baseMoods.some(m=>s.mood===m)) score += 50;
+    if(baseGenres.includes(s.genre)) score += 40;
+    if(baseArtists.includes(s.artist)) score += 30;
+    if(likedSongs.includes(i)) score -= 100;
+    return {song:s, idx:i, score};
+  }).sort((a,b)=>b.score-a.score);
+  let likedNames = baseIdx.map(i=>mySongs[i].title).join(", ");
+  return {list: scored.slice(0,4).map(x=>x.song), reason:`Because you liked: <b>${likedNames}</b> — we picked songs with a similar mood and style for you.`};
+}
+function songCard(s, i, badge){
+  return `<div class="card" onclick="playSong(${i})">
+    <button class="heart-btn ${isLiked(i)?'liked':''}" onclick="toggleLike(${i}, event)">${isLiked(i)?'❤️':'♡'}</button>
+    ${badge?`<span class="rank-badge">${badge}</span>`:''}
+    <img src="${s.img}"><div class="card-body"><h3>${s.title}</h3><p>${s.artist} • ${s.mood}</p><span class="reco-tag">${s.genre}</span><span class="reco-tag">${s.plays}% plays</span><div style="margin-top:12px"><button class="play-mini">▶ Play Song</button></div></div>
+  </div>`;
+}
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderAll(){
+  saveLiked();
+  let sorted = [...mySongs].sort((a,b)=>b.plays-a.plays);
+  document.getElementById('songGrid').innerHTML = mySongs.map((s,i)=>songCard(s,i)).join('');
+  document.getElementById('homeGrid').innerHTML = sorted.slice(0,4).map((s)=>{
+    let idx = mySongs.indexOf(s);
+    return songCard(s, idx, `#${sorted.indexOf(s)+1} POPULAR`);
+  }).join('');
+  let topOrder = [sorted[1], sorted[0], sorted[2]];
+  let topPos = ["No. 2","No. 1","No. 3"];
+  document.getElementById('top3Box').innerHTML = topOrder.map((s,pi)=>{
+    let idx = mySongs.indexOf(s);
+    return `<div class="top3-card ${pi===1?'first':''}" onclick="playSong(${idx});showPage('nowplaying')"><span class="pos">${topPos[pi]}</span><img src="${s.img}"><h4>${s.title}</h4><p>${s.artist} • ${s.plays}%</p><div class="top3-bar" style="width:${s.plays}%"></div></div>`
+  }).join('');
+  document.getElementById('chartBox').innerHTML = sorted.slice(0,5).map((s)=>{
+    let idx = mySongs.indexOf(s); let rank = sorted.indexOf(s)+1;
+    return `<div class="chart-row" onclick="playSong(${idx});showPage('nowplaying')"><span class="num">0${rank}</span><img src="${s.img}"><div class="info"><b>${s.title}</b><p>${s.artist} • ${s.mood}</p></div><div class="bar-wrap"><div class="bar" style="width:${s.plays}%"></div></div><span class="pct">${s.plays}%</span><button class="heart-btn ${isLiked(idx)?'liked':''}" style="position:static" onclick="toggleLike(${idx},event)">${isLiked(idx)?'❤️':'♡'}</button></div>`
+  }).join('');
+  let likedGrid = document.getElementById('likedGrid');
+  let empty = document.getElementById('likedEmpty');
+  if(!likedSongs.length){ likedGrid.innerHTML=''; empty.style.display='block'; document.getElementById('likedSub').innerText = "You have 0 liked songs."; }
+  else { empty.style.display='none'; likedGrid.innerHTML = likedSongs.map(i=>songCard(mySongs[i], i, "LIKED")).join(''); document.getElementById('likedSub').innerText = `You have ${likedSongs.length} liked songs.`; }
+  let reco = getRecommendations();
+  document.getElementById('recoSub').innerText = likedSongs.length ? `Based on ${likedSongs.length} liked songs.` : "Like a song to unlock recommendations based on your taste.";
+  document.getElementById('recoReasonBox').innerHTML = reco.reason;
+  document.getElementById('recoGrid').innerHTML = reco.list.map(s=>songCard(s, mySongs.indexOf(s), "RECOMMENDED")).join('');
+  document.getElementById('recoHomeGrid').innerHTML = reco.list.map(s=>songCard(s, mySongs.indexOf(s), "FOR YOU")).join('');
+  let base = currentIndex!==-1 ? mySongs[currentIndex] : (likedSongs.length ? mySongs[likedSongs[0]] : mySongs[0]);
+  let sameMood = mySongs.filter((s,i)=> i!==mySongs.indexOf(base) && (s.genre===base.genre || s.mood===base.mood));
+  if(!sameMood.length) sameMood = [...mySongs].sort((a,b)=>b.plays-a.plays).slice(0,4);
+  document.getElementById('recoMoodGrid').innerHTML = sameMood.slice(0,4).map(s=>songCard(s, mySongs.indexOf(s), `SIMILAR MOOD • ${base.mood}`)).join('');
+  if(currentIndex!==-1){
+    let nowReco = getRecommendations().list.filter(s=>mySongs.indexOf(s)!==currentIndex).slice(0,2);
+    document.getElementById('nowRecoGrid').innerHTML = nowReco.map(s=>songCard(s, mySongs.indexOf(s), "NEXT?")).join('');
+  }
+  renderQueue();
+  updateMiniPlayer();
+}
+function playSong(i){
+  currentIndex = i;
+  const s = mySongs[i];
+  const audio = document.getElementById('mainAudio');
+  audio.src = s.mp3; audio.play();
+  document.getElementById('nowTitle2').innerText = s.title;
+  document.getElementById('nowArtist2').innerText = s.artist;
+  document.getElementById('nowMood').innerText = s.mood;
+  document.getElementById('mainImg').src = s.img;
+  document.getElementById('nowLikeBtn').innerText = isLiked(i) ? "Liked!" : "Like This Song";
+  const next = mySongs[(i+1)%mySongs.length];
+  document.getElementById('npTitle').innerText = next.title;
+  document.getElementById('npArtist').innerText = next.artist + " • Next";
+  document.getElementById('npImg').src = next.img;
+  const box = document.getElementById('lyricsBox');
+  const data = window.songLyricsDatabase ? window.songLyricsDatabase[s.lyricIndex] : null;
+  if(data && data.lines){
+    let lines = Array.isArray(data.lines) ? data.lines : data.lines.split("\n");
+    lyricLines = lines.filter(l => l.trim() !== "");
+    box.innerHTML = lyricLines.map((line,idx)=>`<div class="lyric-line" id="line-${idx}">${line}</div>`).join('');
+    lyricEls = [...document.querySelectorAll('.lyric-line')];
+  } else {
+    box.innerHTML = `<div class="lyric-line active">Lyrics not found for index ${s.lyricIndex}.</div>`;
+  }
+  renderAll();
+  updateMiniPlayer();
+  showPage('nowplaying');
+}
+const audioEl = document.getElementById('mainAudio');
+audioEl.addEventListener('play', ()=>{
+  document.getElementById('miniPlayBtn').innerText = "⏸";
+  document.getElementById('miniPlayer').classList.remove('paused');
+});
+audioEl.addEventListener('pause', ()=>{
+  document.getElementById('miniPlayBtn').innerText = "▶";
+  document.getElementById('miniPlayer').classList.add('paused');
+});
+audioEl.addEventListener('timeupdate', ()=>{
+  // Progress bar kat Dynamic Island
+  if(audioEl.duration){
+    let pct = (audioEl.currentTime / audioEl.duration) * 100;
+    document.getElementById('miniProgressBar').style.width = pct + "%";
+  }
+  if(!lyricLines.length || !audioEl.duration) return;
+  let delay = songDelays[currentIndex] || 5;
+  let effectiveTime = audioEl.currentTime - delay;
+  if(effectiveTime < 0) effectiveTime = 0;
+  let usableDuration = audioEl.duration - delay;
+  if(usableDuration <= 0) usableDuration = audioEl.duration;
+  let perLine = usableDuration / lyricLines.length;
+  let currentLine = Math.floor(effectiveTime / perLine);
+  if(currentLine >= lyricLines.length) currentLine = lyricLines.length - 1;
+  lyricEls.forEach((el, idx)=>{ el.classList.toggle('active', idx === currentLine); });
+  let active = document.getElementById(`line-${currentLine}`);
+  if(active) active.scrollIntoView({behavior:'smooth', block:'center'});
+});
+audioEl.addEventListener('ended', ()=>{ playNext(); });
+function playNext(){ if(currentIndex===-1) playSong(0); else playSong((currentIndex+1)%mySongs.length); }
+function playPrev(){ if(currentIndex===-1) playSong(0); else playSong((currentIndex-1+mySongs.length)%mySongs.length); }
+function renderQueue(){
+  const list = mySongs.map((s,i)=>`
+    <div class="q-item ${i===currentIndex?'active':''}" onclick="playSong(${i})">
+      <span style="color:#8A7A64;font-weight:900;width:20px;font-family:'Archivo',sans-serif">${i+1}</span><img src="${s.img}"><div><b>${s.title}</b><p>${s.artist}</p></div>
+      <span style="margin-left:auto;color:#8A7A64">${isLiked(i)?'❤️':'▶'}</span>
+    </div>`).join('');
+  document.getElementById('queueList').innerHTML = list;
+  document.getElementById('queueList2').innerHTML = list;
+}
+document.getElementById('datetime').value = new Date().toLocaleString();
+function validateForm(){
+  let name=document.getElementById('name').value.trim();
+  let gender=document.getElementById('gender').value;
+  let email=document.getElementById('email').value.trim();
+  let type=document.getElementById('type').value;
+  let feedback=document.getElementById('feedback').value.trim();
+  if(!name) return alert("Please enter Name!");
+  if(!gender) return alert("Please select Gender!");
+  if(!email||!email.includes("@")) return alert("Please enter valid Email!");
+  if(!type) return alert("Please select Type!");
+  if(!feedback) return alert("Please enter Feedback!");
+  let out=document.getElementById('output'); out.style.display="block";
+  out.innerHTML=`<h3>Thank You!</h3><p><b>Name:</b> ${name}</p><p><b>Gender:</b> ${gender}</p><p><b>Email:</b> ${email}</p><p><b>Type:</b> ${type}</p><p><b>Feedback:</b> ${feedback}</p><p><b>Date:</b> ${document.getElementById('datetime').value}</p>`;
+  return false;
+}
+renderAll();
+</script>
+</body>
+</html>
