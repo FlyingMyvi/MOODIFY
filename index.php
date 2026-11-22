@@ -227,7 +227,7 @@ $tracksData = [
     [
         "id" => 18,
         "title" => "Psycho",
-        "artist" => "Post Malone feat. Ty Dolla $ign",
+        "artist" => "Post Malone feat. Ty Dolla \$ign",
         "genre" => "Hip-Hop",
         "file" => "psychopost.mp3",
         "views" => "9.2M",
@@ -261,7 +261,7 @@ unset($track);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MOODIFY â€” Music Player</title>
+  <title>MOODIFY - Music Player</title>
   <style>
     :root {
       --bg-black: #000000;
@@ -860,8 +860,8 @@ unset($track);
     // Cuba import lyrics.js kalau wujud, kalau ada ralat sintaks dalam lyrics.js dia guna fallback supaya player tak rosak
     let songLyricsDatabase = {};
     try {
-      const module = await import('./lyrics.js');
-      songLyricsDatabase = module.songLyricsDatabase || {};
+      await import('./lyrics.js');
+      songLyricsDatabase = window.songLyricsDatabase || {};
     } catch (err) {
       console.warn("Amaran: Fail lyrics.js ada ralat sintaks (cth: baris tak ada tanda petik). Sila pastikan setiap baris lirik ada tanda petik \"...\".", err);
     }
@@ -1187,7 +1187,7 @@ unset($track);
       audio.volume = parseFloat(val);
     };
 
-    window.onload = initApp;
+    initApp();
   </script>
 </body>
 </html>
