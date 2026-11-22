@@ -53,67 +53,19 @@
         radial-gradient(circle at 85% 85%, rgba(204, 204, 255, 0.05), transparent 40%);
     }
 
-    /* Header */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1rem 2rem;
-      background: rgba(9, 9, 12, 0.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .site-nav {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-      gap: 0.5rem 0.9rem;
-    }
-
-    .site-nav a {
-      color: var(--text-secondary);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-
-    .site-nav a:hover,
-    .site-nav a.active {
-      color: #ccccff;
-    }
-
-    .brand {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 1.45rem;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-    }
-
-    .brand span {
-      color: var(--accent);
-    }
-
-    .brand small {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-    }
-
     /* Custom URL Bar */
+    .video-toolbar {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.25rem 2rem 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .video-toolbar .url-bar {
+      width: 100%;
+    }
+
     .url-bar {
       display: flex;
       align-items: center;
@@ -482,18 +434,12 @@
     }
 
     @media (max-width: 980px) {
-      header {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1rem;
+      .video-toolbar {
+        padding: 1rem 1rem 0;
       }
 
       .url-bar {
         max-width: 100%;
-      }
-
-      .site-nav {
-        justify-content: center;
       }
 
       .theater-container {
@@ -508,16 +454,31 @@
     }
   </style>
   <link rel="stylesheet" href="logo.css" />
+<link rel="stylesheet" href="header.css" />
 </head>
 
 <body>
 
-  <header>
-    <div class="brand">
-      <a href="index.html" class="moodify-logo">MOODI<span>FY</span></a>
-      <small>VIDEO THEATER</small>
-    </div>
+  <header class="global-header">
+    <div class="header-container">
+      <nav class="global-nav" aria-label="Main navigation">
+        <a href="index.html" class="moodify-logo">MOODI<span>FY</span></a>
 
+        <div class="nav-links">
+          <a href="index.html">HOME</a>
+          <a href="index.html#featured">FEATURED</a>
+          <a href="index.html#charts">OUR MUSIC</a>
+          <a href="player.html?v=14#lyrics">LYRICS</a>
+          <a href="player.html?v=14">AUDIO</a>
+          <a href="video.html" class="active" aria-current="page">VIDEO</a>
+          <a href="feedback.html">FEEDBACK</a>
+          <a href="index.html#team">TEAM</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="video-toolbar">
     <form class="url-bar" id="customVideoForm">
       <input
         type="text"
@@ -528,17 +489,7 @@
 
       <button type="submit" class="btn-primary">Play MV</button>
     </form>
-
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="index.html">HOME</a>
-      <a href="index.html#charts">OUR MUSIC</a>
-      <a href="player.html?v=13#lyrics">LYRICS</a>
-      <a href="player.html?v=13">AUDIO</a>
-      <a href="video.html" class="active" aria-current="page">VIDEO</a>
-      <a href="feedback.html">FEEDBACK</a>
-      <a href="index.html#team">TEAM</a>
-    </nav>
-  </header>
+  </div>
 
   <main class="theater-container">
     <section>

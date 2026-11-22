@@ -1,0 +1,81 @@
+/* MOODIFY shared site header */
+
+.global-header {
+    grid-area: header;
+    display: block;
+    padding: 0;
+    background: rgba(9, 9, 12, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.global-header .header-container {
+    width: 88%;
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.global-header .global-nav {
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.global-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.global-header .nav-links a {
+    color: #aaa9b2;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.global-header .nav-links a:hover,
+.global-header .nav-links a.active {
+    color: #ccccff;
+}
+
+.global-header .moodify-logo {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+    .global-header .header-container {
+        width: 92%;
+    }
+
+    .global-header .global-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        min-height: 0;
+        padding: 14px 0;
+        gap: 10px;
+    }
+
+    .global-header .nav-links {
+        gap: 10px 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .global-header .nav-links a {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+}

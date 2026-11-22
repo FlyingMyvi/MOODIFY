@@ -897,22 +897,25 @@ unset($track);
     }
   </style>
 <link rel="stylesheet" href="logo.css" />
+<link rel="stylesheet" href="header.css" />
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
+  <header class="global-header">
+    <div class="header-container">
+      <nav class="global-nav" aria-label="Main navigation">
+        <a href="index.html" class="moodify-logo">MOODI<span>FY</span></a>
 
-      <nav class="header-nav" aria-label="Main navigation">
-        <a href="index.html">HOME</a>
-        <a href="index.html#featured">FEATURED</a>
-        <a href="index.html#charts">OUR MUSIC</a>
-        <a href="player.html?v=13#lyrics">LYRICS</a>
-        <a href="player.html?v=13" class="active" aria-current="page">AUDIO</a>
-        <a href="video.html">VIDEO</a>
-        <a href="feedback.html">FEEDBACK</a>
-        <a href="index.html#team">TEAM</a>
+        <div class="nav-links">
+          <a href="index.html">HOME</a>
+          <a href="index.html#featured">FEATURED</a>
+          <a href="index.html#charts">OUR MUSIC</a>
+          <a href="player.html?v=14#lyrics">LYRICS</a>
+          <a href="player.html?v=14" class="active" aria-current="page">AUDIO</a>
+          <a href="video.html">VIDEO</a>
+          <a href="feedback.html">FEEDBACK</a>
+          <a href="index.html#team">TEAM</a>
+        </div>
       </nav>
     </div>
   </header>
