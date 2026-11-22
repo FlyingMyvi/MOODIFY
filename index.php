@@ -1,4 +1,6 @@
 <?php
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 // index.php - Backend PHP untuk susun lagu & semak fail MP3 dalam folder moodify
 $tracksData = [
     // 1. POP
@@ -261,6 +263,8 @@ unset($track);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
   <title>MOODIFY - Music Player</title>
   <style>
     :root {
@@ -740,7 +744,7 @@ unset($track);
 
     <div class="nav-group">
       <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">🚀 Futuristic Home</div>
-      <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">🎤 Spotify Live Lyrics</div>
+      <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">🎤 MOODIFY Live Lyrics</div>
     </div>
 
     <div class="library-section">
@@ -815,7 +819,7 @@ unset($track);
     <div id="lyricsView" class="lyrics-container">
       <div class="lyrics-header">
         <div>
-          <span class="hero-tag">SPOTIFY REAL-TIME LYRICS</span>
+          <span class="hero-tag">MOODIFY REAL-TIME LYRICS</span>
           <h2 id="lyricsSongTitle" style="font-size: 22px; margin-top: 6px;">Loading...</h2>
         </div>
         <div class="lyrics-header-actions">
@@ -835,7 +839,7 @@ unset($track);
   <aside class="apple-queue-panel">
     <div class="queue-header">
       <h3>Playing Next</h3>
-      <span class="queue-badge">Apple Music Queue</span>
+      <span class="queue-badge">MOODIFY Queue</span>
     </div>
 
     <div class="apple-now-card">
@@ -975,6 +979,10 @@ unset($track);
       updateGeniusSection();
       updateAppleQueue();
       loadTrackSource(0, false);
+
+      if (window.location.hash === '#lyrics') {
+        window.switchMainView('lyrics');
+      }
     }
 
     function loadTrackSource(id, autoPlay = true) {
