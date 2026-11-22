@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Share a suggestion, complaint, or enquiry with MOODIFY.">
+<meta name="theme-color" content="#09090c">
+<title>MOODIFY — Feedback</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Outfit:wght@800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="logo.css" />
+
+<style>
+:root {
+    --black: #09090c;
+    --panel: #111116;
+    --surface: #191920;
+    --lavender: #ccccff;
+    --white: #f5f3ee;
+    --grey: #aaa9b2;
+    --muted: #777682;
+    --border: rgba(255,255,255,0.12);
+    --border-strong: rgba(204,204,255,0.28);
+    --error: #ff9d9d;
+    --success: #b9f5c8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 85% 8%, rgba(145,145,200,0.16), transparent 36%),
+        radial-gradient(ellipse at 8% 75%, rgba(204,204,255,0.05), transparent 32%),
+        var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.container {
+    width: 88%;
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(9,9,12,0.94);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+nav {
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.nav-links a {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: var(--grey);
+    transition: color 0.25s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--lavender);
+}
+
+/* ================= HERO ================= */
+
+.feedback-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 92px 0 76px;
+    border-bottom: 1px solid var(--border);
+    background:
+        linear-gradient(120deg, rgba(17,17,22,0.92), rgba(9,9,12,0.96) 72%),
+        radial-gradient(ellipse at 78% 42%, rgba(145,145,200,0.2), transparent 42%);
+}
+
+.feedback-hero::before,
+.feedback-hero::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(204,204,255,0.13);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.feedback-hero::before {
+    width: 470px;
+    height: 470px;
+    right: -145px;
+    top: 45px;
+    box-shadow: 0 0 90px rgba(204,204,255,0.06) inset;
+}
+
+.feedback-hero::after {
+    width: 210px;
+    height: 210px;
+    right: 155px;
+    top: 172px;
+    border-color: rgba(204,204,255,0.08);
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(250px, 0.55fr);
+    gap: 70px;
+    align-items: end;
+}
+
+.eyebrow,
+.card-kicker,
+.meta-label {
+    display: block;
+    color: var(--lavender);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+}
+
+.hero-copy h1 {
+    margin: 18px 0 22px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(3rem, 6vw, 5.4rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+}
+
+.hero-copy h1 em {
+    color: var(--lavender);
+    font-weight: 500;
+}
+
+.hero-copy p {
+    max-width: 540px;
+    color: var(--grey);
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.hero-meta {
+    display: grid;
+    gap: 20px;
+    padding-left: 28px;
+    border-left: 1px solid var(--border);
+}
+
+.meta-row {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.meta-number {
+    color: var(--lavender);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.7;
+}
+
+.meta-row p {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+/* ================= FORM SECTION ================= */
+
+.feedback-section {
+    padding: 72px 0 100px;
+}
+
+.feedback-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+    gap: 34px;
+    align-items: start;
+}
+
+.form-card {
+    background:
+        linear-gradient(155deg, rgba(204,204,255,0.07), rgba(17,17,22,0.96) 34%),
+        var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+    padding: 38px;
+}
+
+.card-heading {
+    padding-bottom: 26px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-heading h2,
+.info-card h2,
+.success-panel h2 {
+    margin: 10px 0 8px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 3.2vw, 2.8rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+}
+
+.card-heading p,
+.info-card p,
+.success-panel > p {
+    color: var(--grey);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.required {
+    color: var(--lavender);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.field-full {
+    grid-column: 1 / -1;
+}
+
+.field label,
+.honeypot label {
+    margin-bottom: 8px;
+    color: var(--grey);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+}
+
+.label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.label-row label {
+    margin-bottom: 0;
+}
+
+.char-count {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: rgba(5,5,8,0.72);
+    color: var(--white);
+    padding: 13px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.field select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 42px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23ccccff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px 8px;
+}
+
+.field select option {
+    background: #111116;
+    color: var(--white);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #5f5e69;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: var(--border-strong);
+    background-color: rgba(12,12,18,0.95);
+    box-shadow: 0 0 0 3px rgba(204,204,255,0.08);
+}
+
+.field textarea {
+    min-height: 160px;
+    resize: vertical;
+    line-height: 1.65;
+}
+
+.field input[readonly] {
+    color: var(--lavender);
+    background: rgba(204,204,255,0.04);
+    cursor: default;
+}
+
+.field.invalid input,
+.field.invalid select,
+.field.invalid textarea {
+    border-color: rgba(255,157,157,0.75);
+    box-shadow: 0 0 0 3px rgba(255,157,157,0.06);
+}
+
+.field-error {
+    min-height: 16px;
+    margin-top: 6px;
+    color: var(--error);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.hint {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.form-status {
+    margin-bottom: 22px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,157,157,0.35);
+    background: rgba(255,157,157,0.07);
+    color: var(--error);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.form-status.success {
+    border-color: rgba(185,245,200,0.35);
+    background: rgba(185,245,200,0.07);
+    color: var(--success);
+}
+
+.form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    margin-top: 26px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 1px solid var(--lavender);
+    background: var(--lavender);
+    color: #09090c;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #e4e4ff;
+    transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+}
+
+.submit-btn .arrow {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) .arrow {
+    transform: translateX(3px);
+}
+
+.storage-note {
+    max-width: 340px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.55;
+    text-align: right;
+}
+
+/* ================= SUCCESS ================= */
+
+.success-panel {
+    padding: 10px 4px 4px;
+    outline: none;
+}
+
+.success-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--lavender);
+    background: rgba(204,204,255,0.06);
+}
+
+.success-mark svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.receipt {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 28px 0;
+    background: var(--border);
+    border: 1px solid var(--border);
+}
+
+.receipt div {
+    background: var(--panel);
+    padding: 14px 16px;
+}
+
+.receipt dt {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+}
+
+.receipt dd {
+    margin-top: 4px;
+    color: var(--white);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.ghost-btn {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--lavender);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.ghost-btn:hover {
+    background: rgba(204,204,255,0.08);
+    border-color: var(--lavender);
+}
+
+/* ================= INFO PANEL ================= */
+
+.info-panel {
+    position: sticky;
+    top: 112px;
+    display: grid;
+    gap: 22px;
+}
+
+.info-card {
+    padding: 30px;
+    border: 1px solid var(--border);
+    background: rgba(17,17,22,0.72);
+}
+
+.info-card h2 {
+    font-size: clamp(1.8rem, 2.7vw, 2.4rem);
+}
+
+.response-list {
+    border-top: 1px solid var(--border);
+}
+
+.response-item {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 12px;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.response-index {
+    padding-top: 2px;
+    color: var(--lavender);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.response-item h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.response-item p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.privacy-card {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid rgba(204,204,255,0.16);
+    background: rgba(204,204,255,0.035);
+}
+
+.privacy-dot {
+    width: 7px;
+    height: 7px;
+    margin-top: 7px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--lavender);
+    box-shadow: 0 0 12px rgba(204,204,255,0.7);
+}
+
+.privacy-card p {
+    color: var(--grey);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0 38px;
+    text-align: center;
+}
+
+footer p {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 22px;
+    margin: 22px 0 26px;
+}
+
+.footer-links a {
+    color: var(--grey);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: var(--lavender);
+}
+
+/* ================= ANIMATION ================= */
+
+.reveal {
+    animation: rise 0.55s ease both;
+}
+
+.info-panel.reveal {
+    animation-delay: 0.08s;
+}
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 980px) {
+    .hero-inner,
+    .feedback-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-meta {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        padding-left: 0;
+        padding-top: 24px;
+        border-left: 0;
+        border-top: 1px solid var(--border);
+    }
+
+    .info-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 720px) {
+    nav {
+        min-height: 74px;
+        padding: 14px 0;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        justify-content: flex-end;
+        gap: 10px 16px;
+    }
+
+    .nav-links a {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .feedback-hero {
+        padding: 64px 0 52px;
+    }
+
+    .feedback-hero::before {
+        width: 320px;
+        height: 320px;
+        right: -170px;
+        top: 80px;
+    }
+
+    .feedback-hero::after {
+        display: none;
+    }
+
+    .feedback-section {
+        padding: 48px 0 70px;
+    }
+
+    .form-card {
+        padding: 24px;
+    }
+
+    .form-grid,
+    .receipt {
+        grid-template-columns: 1fr;
+    }
+
+    .form-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .storage-note {
+        max-width: none;
+        text-align: left;
+    }
+
+    .submit-btn {
+        width: 100%;
+    }
+
+    .hero-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-meta .meta-row {
+        grid-template-columns: 24px 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="container">
+        <nav>
+            <a href="index.html" class="moodify-logo">MOODI<span>FY</span></a>
+
+            <div class="nav-links">
+                <a href="index.html">HOME</a>
+                <a href="index.html#featured">FEATURED</a>
+                <a href="index.html#charts">OUR MUSIC</a>
+                <a href="player.html?v=10#lyrics">LYRICS</a>
+                <a href="player.html?v=10">AUDIO</a>
+                <a href="video.html">VIDEO</a>
+                <a href="feedback.html" class="active" aria-current="page">FEEDBACK</a>
+                <a href="index.html#team">TEAM</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+<section class="feedback-hero">
+    <div class="container hero-inner">
+        <div class="hero-copy">
+            <span class="eyebrow">WE'RE LISTENING</span>
+            <h1>Tell us what<br><em>you think.</em></h1>
+            <p>
+                Every note matters. Send us a suggestion, raise a concern, or ask a question.
+                Your feedback helps shape the MOODIFY experience.
+            </p>
+        </div>
+
+        <div class="hero-meta">
+            <div class="meta-row">
+                <span class="meta-number">01</span>
+                <div>
+                    <span class="meta-label">SHARE</span>
+                    <p>Fill in the form with your details and feedback.</p>
+                </div>
+            </div>
+            <div class="meta-row">
+                <span class="meta-number">02</span>
+                <div>
+                    <span class="meta-label">SUBMIT</span>
+                    <p>Your date and time are recorded automatically.</p>
+                </div>
+            </div>
+            <div class="meta-row">
+                <span class="meta-number">03</span>
+                <div>
+                    <span class="meta-label">REVIEW</span>
+                    <p>We read every message and follow up when needed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="feedback-section">
+    <div class="container feedback-layout">
+
+        <div class="form-card reveal">
+            <div class="card-heading">
+                <span class="card-kicker">FEEDBACK FORM</span>
+                <h2>Share your thoughts.</h2>
+                <p>Fields marked <span class="required">*</span> are required.</p>
+            </div>
+
+            <form id="feedbackForm" novalidate>
+                <div class="form-status" id="formStatus" role="alert" aria-live="assertive" hidden></div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="name">Name <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Your name"
+                            maxlength="80"
+                            autocomplete="name"
+                            required
+                            aria-describedby="nameError"
+                        >
+                        <p class="field-error" id="nameError"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="gender">Gender <span class="required">*</span></label>
+                        <select id="gender" name="gender" required aria-describedby="genderError">
+                            <option value="">Select gender</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                        <p class="field-error" id="genderError"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            maxlength="120"
+                            autocomplete="email"
+                            required
+                            aria-describedby="emailError"
+                        >
+                        <p class="field-error" id="emailError"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="type">Type of Feedback <span class="required">*</span></label>
+                        <select id="type" name="type" required aria-describedby="typeError">
+                            <option value="">Select a type</option>
+                            <option value="Suggestion">Suggestion</option>
+                            <option value="Complaint">Complaint</option>
+                            <option value="Enquiry">Enquiry</option>
+                        </select>
+                        <p class="field-error" id="typeError"></p>
+                    </div>
+
+                    <div class="field field-full">
+                        <label for="dateTime">Date &amp; Time</label>
+                        <input
+                            type="text"
+                            id="dateTime"
+                            name="dateTime"
+                            readonly
+                            aria-describedby="dateTimeHint"
+                        >
+                        <p class="hint" id="dateTimeHint">Captured automatically when you send.</p>
+                    </div>
+
+                    <div class="field field-full">
+                        <div class="label-row">
+                            <label for="message">Your Feedback <span class="required">*</span></label>
+                            <span class="char-count" id="charCount">0 / 1500</span>
+                        </div>
+                        <textarea
+                            id="message"
+                            name="message"
+                            placeholder="Tell us what's on your mind..."
+                            maxlength="1500"
+                            rows="6"
+                            required
+                            aria-describedby="messageError"
+                        ></textarea>
+                        <p class="field-error" id="messageError"></p>
+                    </div>
+                </div>
+
+                <div class="honeypot" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span id="submitLabel">Send Feedback</span>
+                        <span class="arrow" aria-hidden="true">&rarr;</span>
+                    </button>
+                    <p class="storage-note" id="storageNote">
+                        Submissions are stored on the server when PHP is available;
+                        otherwise they are saved in this browser.
+                    </p>
+                </div>
+            </form>
+
+            <div class="success-panel" id="successPanel" role="status" tabindex="-1" hidden>
+                <div class="success-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <span class="card-kicker">SUBMITTED</span>
+                <h2>Feedback received.</h2>
+                <p>Thank you, <strong id="successName"></strong>. We've logged your feedback.</p>
+
+                <dl class="receipt">
+                    <div>
+                        <dt>Reference</dt>
+                        <dd id="successRef"></dd>
+                    </div>
+                    <div>
+                        <dt>Type</dt>
+                        <dd id="successType"></dd>
+                    </div>
+                    <div>
+                        <dt>Date &amp; Time</dt>
+                        <dd id="successDate"></dd>
+                    </div>
+                    <div>
+                        <dt>Storage</dt>
+                        <dd id="successStorage"></dd>
+                    </div>
+                </dl>
+
+                <button type="button" class="ghost-btn" id="anotherBtn">Send another feedback</button>
+            </div>
+        </div>
+
+        <aside class="info-panel reveal">
+            <div class="info-card">
+                <span class="card-kicker">WHAT HAPPENS NEXT</span>
+                <h2>Your voice,<br>on record.</h2>
+                <p>
+                    We use feedback to improve the player, the library, and the way
+                    MOODIFY feels. Choose the type that best fits your message.
+                </p>
+            </div>
+
+            <div class="response-list">
+                <div class="response-item">
+                    <span class="response-index">01</span>
+                    <div>
+                        <h3>Suggestion</h3>
+                        <p>An idea for a feature, song, artist, or improvement.</p>
+                    </div>
+                </div>
+                <div class="response-item">
+                    <span class="response-index">02</span>
+                    <div>
+                        <h3>Complaint</h3>
+                        <p>Something isn't working as it should, or didn't meet your expectations.</p>
+                    </div>
+                </div>
+                <div class="response-item">
+                    <span class="response-index">03</span>
+                    <div>
+                        <h3>Enquiry</h3>
+                        <p>A question about MOODIFY, the music, or how the site works.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="privacy-card">
+                <span class="privacy-dot" aria-hidden="true"></span>
+                <p>
+                    Your email is used only to respond to your feedback.
+                    It is never displayed publicly.
+                </p>
+            </div>
+        </aside>
+
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <h2 class="moodify-logo moodify-logo-footer">MOODI<span>FY</span></h2>
+        <p>Music Beyond Boundaries.</p>
+
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#featured">Featured</a>
+            <a href="index.html#charts">Our Music</a>
+            <a href="index.html#artists">Artists</a>
+            <a href="index.html#team">Team</a>
+            <a href="player.html?v=10#lyrics">Lyrics</a>
+            <a href="player.html?v=10">Audio</a>
+            <a href="video.html">Video</a>
+            <a href="feedback.html">Feedback</a>
+        </div>
+
+        <p>&copy; 2026 MOODIFY. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+(() => {
+    'use strict';
+
+    const STORAGE_KEY = 'moodify_feedback_submissions';
+    const MAX_MESSAGE = 1500;
+    const isStaticHost = location.hostname.endsWith('github.io') || location.protocol === 'file:';
+
+    const form = document.getElementById('feedbackForm');
+    const formStatus = document.getElementById('formStatus');
+    const successPanel = document.getElementById('successPanel');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitLabel = document.getElementById('submitLabel');
+    const anotherBtn = document.getElementById('anotherBtn');
+    const charCount = document.getElementById('charCount');
+    const dateTimeInput = document.getElementById('dateTime');
+    const successName = document.getElementById('successName');
+    const successRef = document.getElementById('successRef');
+    const successType = document.getElementById('successType');
+    const successDate = document.getElementById('successDate');
+    const successStorage = document.getElementById('successStorage');
+
+    const fields = {
+        name: document.getElementById('name'),
+        gender: document.getElementById('gender'),
+        email: document.getElementById('email'),
+        type: document.getElementById('type'),
+        message: document.getElementById('message')
+    };
+
+    const errorElements = {
+        name: document.getElementById('nameError'),
+        gender: document.getElementById('genderError'),
+        email: document.getElementById('emailError'),
+        type: document.getElementById('typeError'),
+        message: document.getElementById('messageError')
+    };
+
+    const dateFormatter = new Intl.DateTimeFormat('en-MY', {
+        dateStyle: 'full',
+        timeStyle: 'short'
+    });
+
+    function formatDateTime(date) {
+        return dateFormatter.format(date);
+    }
+
+    function updateDateTime(date = new Date()) {
+        dateTimeInput.value = formatDateTime(date);
+        dateTimeInput.dataset.iso = date.toISOString();
+    }
+
+    function updateCharCount() {
+        charCount.textContent = `${fields.message.value.length} / ${MAX_MESSAGE}`;
+    }
+
+    function setStatus(message, type = 'error') {
+        formStatus.textContent = message;
+        formStatus.className = `form-status ${type}`;
+        formStatus.hidden = !message;
+    }
+
+    function clearStatus() {
+        formStatus.textContent = '';
+        formStatus.hidden = true;
+        formStatus.className = 'form-status';
+    }
+
+    function setFieldError(name, message) {
+        const field = fields[name];
+        const error = errorElements[name];
+        if (!field || !error) return;
+
+        error.textContent = message || '';
+        field.setAttribute('aria-invalid', message ? 'true' : 'false');
+        const wrapper = field.closest('.field');
+        if (wrapper) wrapper.classList.toggle('invalid', Boolean(message));
+    }
+
+    function clearErrors() {
+        Object.keys(fields).forEach((name) => setFieldError(name, ''));
+        clearStatus();
+    }
+
+    function validate() {
+        let firstInvalid = null;
+        const errors = {};
+
+        const name = fields.name.value.trim();
+        const gender = fields.gender.value;
+        const email = fields.email.value.trim();
+        const type = fields.type.value;
+        const message = fields.message.value.trim();
+
+        if (name.length < 2) {
+            errors.name = 'Please enter your name (at least 2 characters).';
+        } else if (name.length > 80) {
+            errors.name = 'Name must be 80 characters or fewer.';
+        }
+
+        if (!gender) {
+            errors.gender = 'Please select a gender.';
+        }
+
+        if (!email) {
+            errors.email = 'Please enter your email address.';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.email = 'Please enter a valid email address.';
+        } else if (email.length > 120) {
+            errors.email = 'Email must be 120 characters or fewer.';
+        }
+
+        if (!type) {
+            errors.type = 'Please choose a feedback type.';
+        }
+
+        if (message.length < 10) {
+            errors.message = 'Please write at least 10 characters.';
+        } else if (message.length > MAX_MESSAGE) {
+            errors.message = `Feedback must be ${MAX_MESSAGE} characters or fewer.`;
+        }
+
+        Object.keys(fields).forEach((key) => {
+            setFieldError(key, errors[key] || '');
+            if (errors[key] && !firstInvalid) firstInvalid = fields[key];
+        });
+
+        if (firstInvalid) {
+            setStatus('Please check the highlighted fields and try again.');
+            firstInvalid.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function buildPayload() {
+        return {
+            name: fields.name.value.trim(),
+            gender: fields.gender.value,
+            email: fields.email.value.trim(),
+            type: fields.type.value,
+            message: fields.message.value.trim(),
+            submittedAt: new Date().toISOString(),
+            page: 'feedback.html'
+        };
+    }
+
+    function makeReference() {
+        if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+            const bytes = new Uint8Array(3);
+            window.crypto.getRandomValues(bytes);
+            return 'MOOD-' + Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+        return 'MOOD-' + Math.random().toString(16).slice(2, 8).toUpperCase();
+    }
+
+    function saveLocally(payload) {
+        const record = {
+            ...payload,
+            reference: makeReference(),
+            storage: 'local',
+            savedAt: new Date().toISOString()
+        };
+
+        try {
+            const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const list = Array.isArray(existing) ? existing : [];
+            list.unshift(record);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
+        } catch (error) {
+            console.warn('Local feedback storage is unavailable.', error);
+        }
+
+        return {
+            reference: record.reference,
+            submittedAt: record.submittedAt,
+            storage: 'This browser'
+        };
+    }
+
+    async function submitToServer(payload) {
+        if (isStaticHost) return null;
+
+        const response = await fetch('feedback.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            throw new Error('PHP feedback endpoint is unavailable.');
+        }
+
+        const data = await response.json();
+
+        if (response.status === 422) {
+            const error = new Error(data.error || 'Please check your details and try again.');
+            error.isValidationError = true;
+            throw error;
+        }
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.error || 'The feedback server could not save your message.');
+        }
+
+        return data;
+    }
+
+    function setLoading(loading) {
+        submitBtn.disabled = loading;
+        submitLabel.textContent = loading ? 'Sending...' : 'Send Feedback';
+    }
+
+    function showSuccess(payload, result) {
+        form.hidden = true;
+        successPanel.hidden = false;
+        successName.textContent = payload.name;
+        successRef.textContent = result.reference;
+        successType.textContent = payload.type;
+        successDate.textContent = formatDateTime(new Date(result.submittedAt || payload.submittedAt));
+        successStorage.textContent = result.storage;
+        successPanel.focus();
+    }
+
+    function resetForm() {
+        form.reset();
+        clearErrors();
+        updateDateTime();
+        updateCharCount();
+        form.hidden = false;
+        successPanel.hidden = true;
+        fields.name.focus();
+    }
+
+    fields.message.addEventListener('input', updateCharCount);
+
+    Object.keys(fields).forEach((name) => {
+        const field = fields[name];
+        field.addEventListener('input', () => {
+            setFieldError(name, '');
+            if (formStatus.textContent.includes('highlighted fields')) clearStatus();
+        });
+        field.addEventListener('change', () => {
+            setFieldError(name, '');
+            if (formStatus.textContent.includes('highlighted fields')) clearStatus();
+        });
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        clearStatus();
+
+        if (document.getElementById('website').value) {
+            setStatus('Unable to submit this form.');
+            return;
+        }
+
+        if (!validate()) return;
+
+        const payload = buildPayload();
+        updateDateTime(new Date(payload.submittedAt));
+        setLoading(true);
+
+        try {
+            let result = await submitToServer(payload);
+
+            if (!result) {
+                result = saveLocally(payload);
+            }
+
+            showSuccess(payload, result);
+        } catch (error) {
+            if (error.isValidationError) {
+                setStatus(error.message);
+            } else {
+                console.warn('Server submission failed; saving locally instead.', error);
+                const result = saveLocally(payload);
+                showSuccess(payload, result);
+            }
+        } finally {
+            setLoading(false);
+        }
+    });
+
+    anotherBtn.addEventListener('click', resetForm);
+
+    updateDateTime();
+    updateCharCount();
+})();
+</script>
+
+</body>
+</html>
