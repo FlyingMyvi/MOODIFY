@@ -217,7 +217,7 @@ $tracksData = [
     [
         "id" => 17,
         "title" => "Lose My Mind",
-        "artist" => "Don Toliver / Lil Wayne",
+        "artist" => "Don Toliver feat. Doja Cat",
         "genre" => "Hip-Hop",
         "file" => "music/hiphop/losemymind.mp3",
         "views" => "3.6M",
@@ -917,7 +917,7 @@ unset($track);
   <!-- ELEMEN AUDIO HTML5 SEBENAR -->
   <audio id="realAudioPlayer" preload="metadata"></audio>
 
-  <script src="lyrics-timed.js?v=2"></script>
+  <script src="lyrics-timed.js?v=3"></script>
 
   <script type="module">
     // Cuba import lyrics.js kalau wujud, kalau ada ralat sintaks dalam lyrics.js dia guna fallback supaya player tak rosak
@@ -989,7 +989,12 @@ unset($track);
     let activeTimedIndex = -1;
     const LYRIC_OFFSET_KEY = 'moodify_php_lyric_offsets';
     let lyricOffsets = JSON.parse(localStorage.getItem(LYRIC_OFFSET_KEY) || '{}');
-    const timedKeyByTrack = { 0: 0, 1: 1, 3: 2, 5: 8, 6: 5, 7: 6, 8: 7, 9: 3, 10: 4 };
+    const timedKeyByTrack = {
+      0: 0, 1: 1, 2: 9, 3: 2, 4: 10,
+      5: 8, 6: 5, 7: 6, 8: 7, 9: 3, 10: 4,
+      11: 11, 12: 12, 13: 13, 14: 14, 15: 15,
+      16: 16, 17: 17, 18: 18, 19: 19
+    };
 
     const audio = document.getElementById('realAudioPlayer');
     audio.volume = 0.7;
