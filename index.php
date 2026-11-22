@@ -266,6 +266,7 @@ unset($track);
   <meta http-equiv="Cache-Control" content="no-store" />
   <meta http-equiv="Pragma" content="no-cache" />
   <title>MOODIFY - Music Player</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-black: #000000;
@@ -732,15 +733,13 @@ unset($track);
     }
     .player-notice.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+<link rel="stylesheet" href="logo.css" />
 </head>
 <body>
 
   <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-orb"></div>
-      <span>Moodify</span>
-    </div>
+    <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
 
     <div class="nav-group">
       <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">🚀 Futuristic Home</div>

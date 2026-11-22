@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MOODIFY â€” Music Player</title>
+<title>MOODIFY - Music Player</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&display=swap" rel="stylesheet" />
 <style>
   :root{--bg-black:#000;--bg-panel:#08080C;--bg-surface:#111118;--bg-elevated:#1A1A24;--accent-pop:#CCCCFF;--accent-glow:rgba(204,204,255,.35);--border-subtle:rgba(204,204,255,.16);--text-primary:#FFF;--text-secondary:#9E9EB5;--text-on-accent:#050508}
   *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif}
@@ -90,10 +91,11 @@
   .upload-box p{font-size:12px;color:var(--text-secondary);margin-bottom:8px}
   .upload-btn{background:var(--accent-pop);color:#050508;border:none;padding:8px 16px;border-radius:500px;font-weight:800;font-size:12px;cursor:pointer}
 </style>
+<link rel="stylesheet" href="logo.css" />
 </head>
 <body>
 <aside class="sidebar">
-  <div class="brand"><div class="brand-orb"></div><span>MOODIFY</span></div>
+  <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
   <div class="nav-group">
     <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">🚀 Futuristic Home</div>
     <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">🎤 Spotify Live Lyrics</div>
