@@ -696,8 +696,8 @@ footer p {
                 <a href="#home">HOME</a>
                 <a href="#featured">FEATURED</a>
                 <a href="#charts">OUR MUSIC</a>
-                <a href="player.html?v=10#lyrics">LYRICS</a>
-                <a href="player.html?v=10">AUDIO</a>
+                <a href="player.html?v=11#lyrics">LYRICS</a>
+                <a href="player.html?v=11">AUDIO</a>
                 <a href="video.html">VIDEO</a>
                 <a href="feedback.html">FEEDBACK</a>
                 <a href="#team">TEAM</a>
@@ -1229,8 +1229,8 @@ footer p {
             <a href="#charts">Our Music</a>
             <a href="#artists">Artists</a>
             <a href="#team">Team</a>
-            <a href="player.html?v=10#lyrics">Lyrics</a>
-            <a href="player.html?v=10">Audio</a>
+            <a href="player.html?v=11#lyrics">Lyrics</a>
+            <a href="player.html?v=11">Audio</a>
             <a href="video.html">Video</a>
             <a href="feedback.html">Feedback</a>
         </div>
@@ -1311,7 +1311,7 @@ document.querySelectorAll(".music-list").forEach(function(list) {
 
         function openTrack() {
             window.location.href =
-                "player.html?v=10&play=" + trackId;
+                "player.html?v=11&play=" + trackId;
         }
 
         row.addEventListener("click", openTrack);
@@ -1327,110 +1327,129 @@ document.querySelectorAll(".music-list").forEach(function(list) {
 
 /* LOAD ALBUM ARTWORK */
 
-const localAlbumCovers = [
-    "MOODIFY_IMAGES/songs/01_as_it_was.jpg",
-    "MOODIFY_IMAGES/songs/02_i_think_he_knows.jpg",
-    "MOODIFY_IMAGES/songs/03_all_too_well_10_min.jpg",
-    "MOODIFY_IMAGES/songs/04_dancing_on_my_own.jpg",
-    "MOODIFY_IMAGES/songs/05_quit_playing_games.jpg",
-    "MOODIFY_IMAGES/songs/06_the_first_snow.jpg",
-    "MOODIFY_IMAGES/songs/07_just_us_2.jpg",
-    "MOODIFY_IMAGES/songs/08_psycho_red_velvet.jpg",
-    "MOODIFY_IMAGES/songs/09_so_lets_love.jpg",
-    "MOODIFY_IMAGES/songs/10_blind.jpg",
-    "MOODIFY_IMAGES/songs/11_like_i_want_you.jpg",
-    "MOODIFY_IMAGES/songs/12_i_swear_ill_never_leave_again.jpg",
-    "MOODIFY_IMAGES/songs/13_best_part.jpg",
-    "MOODIFY_IMAGES/songs/14_folded.jpg",
-    "MOODIFY_IMAGES/songs/15_open_arms.jpg",
-    "MOODIFY_IMAGES/songs/16_ingat.jpg",
-    "MOODIFY_IMAGES/songs/17_i_know.jpg",
-    "MOODIFY_IMAGES/songs/18_lose_my_mind.jpg",
-    "MOODIFY_IMAGES/songs/19_psycho_post_malone.jpg",
-    "MOODIFY_IMAGES/songs/20_luther.jpg"
+const itunesTrackIds = [
+    1615585008,
+    1468058178,
+    1590368935,
+    1440486824,
+    217939769,
+    854908536,
+    1473561758,
+    1491888506,
+    1689326484,
+    1716548251,
+    1488412765,
+    1440538861,
+    1799080776,
+    1885055409,
+    1658650800,
+    1788364364,
+    1708274785,
+    1821963325,
+    1373506178,
+    1781316886
 ];
+
+async function fetchItunesLookup(ids) {
+
+    const url =
+        "https://itunes.apple.com/lookup?id=" +
+        ids.join(",") +
+        "&country=MY";
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+
+        const response = await fetch(url);
+
+        if (response.ok) {
+            return await response.json();
+        }
+
+        if (attempt === 0) {
+            await new Promise(
+                (resolve) => setTimeout(resolve, 1200)
+            );
+        }
+    }
+
+    throw new Error("iTunes lookup failed");
+}
+
+function applyAlbumCover(cover, src, title) {
+
+    if (!src) {
+        cover.innerHTML =
+            '<div class="cover-placeholder">♪</div>';
+        return;
+    }
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = (title || "Album") + " album artwork";
+    img.loading = "lazy";
+
+    img.onerror = function() {
+        cover.innerHTML =
+            '<div class="cover-placeholder">♪</div>';
+    };
+
+    cover.innerHTML = "";
+    cover.appendChild(img);
+}
 
 async function loadAlbumArtwork() {
 
-    const covers = document.querySelectorAll(
-        ".album-cover[data-query]"
+    const covers = Array.from(
+        document.querySelectorAll(".album-cover[data-query]")
     );
 
-    let coverIndex = 0;
+    try {
 
-    for (const cover of covers) {
+        const data = await fetchItunesLookup(itunesTrackIds);
+        const results = Array.isArray(data.results)
+            ? data.results
+            : [];
+        const byId = new Map(
+            results.map((result) => [
+                String(result.trackId),
+                result
+            ])
+        );
 
-        const localArt = localAlbumCovers[coverIndex];
-        coverIndex++;
+        covers.forEach((cover, index) => {
 
-        if (localArt) {
-
-            const rowTitle =
-                cover.closest(".music-row")
-                    ?.querySelector("h4")
-                    ?.textContent.trim() || "Album";
-
-            cover.innerHTML = "";
-
-            const localImg = document.createElement("img");
-            localImg.src = localArt;
-            localImg.alt = rowTitle + " album artwork";
-            localImg.loading = "lazy";
-
-            localImg.onerror = function() {
-                cover.innerHTML =
-                    '<div class="cover-placeholder">♪</div>';
-            };
-
-            cover.appendChild(localImg);
-            continue;
-        }
-
-        const query = cover.dataset.query;
-
-        try {
-
-            const response = await fetch(
-                "https://itunes.apple.com/search?term=" +
-                encodeURIComponent(query) +
-                "&entity=song&limit=5"
+            const result = byId.get(
+                String(itunesTrackIds[index])
             );
-
-            const data = await response.json();
-
-            if (data.results && data.results.length > 0) {
-
-                const result = data.results[0];
-
-                const imageUrl = result.artworkUrl100
+            const row = cover.closest(".music-row");
+            const title =
+                row?.querySelector("h4")
+                    ?.textContent.trim() || "Album";
+            const artwork =
+                result && result.artworkUrl100
                     ? result.artworkUrl100.replace(
                         "100x100bb",
                         "600x600bb"
                     )
                     : "";
 
-                if (imageUrl) {
+            applyAlbumCover(cover, artwork, title);
+        });
 
-                    cover.innerHTML = "";
+    } catch (error) {
 
-                    const img = document.createElement("img");
+        console.log(
+            "Artwork could not load from iTunes:",
+            error
+        );
 
-                    img.src = imageUrl;
-                    img.alt = result.trackName + " album artwork";
-                    img.loading = "lazy";
-
-                    img.onerror = function() {
-                        cover.innerHTML =
-                            '<div class="cover-placeholder">♪</div>';
-                    };
-
-                    cover.appendChild(img);
-                }
-            }
-
-        } catch (error) {
-            console.log("Artwork could not load:", query);
-        }
+        covers.forEach((cover) => {
+            const row = cover.closest(".music-row");
+            const title =
+                row?.querySelector("h4")
+                    ?.textContent.trim() || "Album";
+            applyAlbumCover(cover, "", title);
+        });
     }
 }
 

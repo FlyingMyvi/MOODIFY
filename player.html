@@ -1053,34 +1053,6 @@
     }
 ];
 
-    // Local artwork downloaded by image.php (MOODIFY_IMAGES/songs)
-    const coverArtByTrackId = [
-      "MOODIFY_IMAGES/songs/01_as_it_was.jpg",
-      "MOODIFY_IMAGES/songs/02_i_think_he_knows.jpg",
-      "MOODIFY_IMAGES/songs/03_all_too_well_10_min.jpg",
-      "MOODIFY_IMAGES/songs/04_dancing_on_my_own.jpg",
-      "MOODIFY_IMAGES/songs/05_quit_playing_games.jpg",
-      "MOODIFY_IMAGES/songs/06_the_first_snow.jpg",
-      "MOODIFY_IMAGES/songs/07_just_us_2.jpg",
-      "MOODIFY_IMAGES/songs/08_psycho_red_velvet.jpg",
-      "MOODIFY_IMAGES/songs/09_so_lets_love.jpg",
-      "MOODIFY_IMAGES/songs/10_blind.jpg",
-      "MOODIFY_IMAGES/songs/11_like_i_want_you.jpg",
-      "MOODIFY_IMAGES/songs/12_i_swear_ill_never_leave_again.jpg",
-      "MOODIFY_IMAGES/songs/13_best_part.jpg",
-      "MOODIFY_IMAGES/songs/14_folded.jpg",
-      "MOODIFY_IMAGES/songs/15_open_arms.jpg",
-      "MOODIFY_IMAGES/songs/16_ingat.jpg",
-      "MOODIFY_IMAGES/songs/17_i_know.jpg",
-      "MOODIFY_IMAGES/songs/18_lose_my_mind.jpg",
-      "MOODIFY_IMAGES/songs/19_psycho_post_malone.jpg",
-      "MOODIFY_IMAGES/songs/20_luther.jpg"
-    ];
-
-    tracks.forEach(track => {
-      track.art = coverArtByTrackId[track.id] || '';
-    });
-
     function coverMarkup(track) {
       if (!track.art) return '';
       const alt = String(track.title).replace(/"/g, '&quot;') + ' cover';
@@ -1090,6 +1062,78 @@
     function setArtwork(element, track) {
       element.innerHTML = `<span>${track.emoji}</span>${coverMarkup(track)}`;
       element.style.background = track.color;
+    }
+
+    const itunesTrackIds = [
+      1615585008,
+      1468058178,
+      1590368935,
+      1440486824,
+      217939769,
+      854908536,
+      1473561758,
+      1491888506,
+      1689326484,
+      1716548251,
+      1488412765,
+      1440538861,
+      1799080776,
+      1885055409,
+      1658650800,
+      1788364364,
+      1708274785,
+      1821963325,
+      1373506178,
+      1781316886
+    ];
+
+    async function fetchItunesLookup(ids) {
+      const url =
+        'https://itunes.apple.com/lookup?id=' +
+        ids.join(',') +
+        '&country=MY';
+
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const response = await fetch(url);
+
+        if (response.ok) {
+          return await response.json();
+        }
+
+        if (attempt === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 1200));
+        }
+      }
+
+      throw new Error('iTunes lookup failed');
+    }
+
+    async function loadItunesArtwork() {
+      try {
+        const data = await fetchItunesLookup(itunesTrackIds);
+        const results = Array.isArray(data.results) ? data.results : [];
+        const byId = new Map(
+          results.map((result) => [String(result.trackId), result])
+        );
+        let changed = false;
+
+        tracks.forEach((track) => {
+          const result = byId.get(String(itunesTrackIds[track.id]));
+
+          if (result && result.artworkUrl100) {
+            track.art = result.artworkUrl100.replace('100x100bb', '600x600bb');
+            changed = true;
+          }
+        });
+
+        if (!changed) return;
+
+        renderGenreCards(activeGenre);
+        updatePlayerDockMeta();
+        updateAppleQueue();
+      } catch (error) {
+        console.warn('iTunes artwork lookup failed', error);
+      }
     }
 
     const genres = [
@@ -1217,6 +1261,8 @@
       if (window.location.hash === '#lyrics') {
         window.switchMainView('lyrics');
       }
+
+      loadItunesArtwork();
 
       syncTrackExistence().then((changed) => {
         if (!changed) return;
