@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>MOODIFY — Music Video Theater</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -448,7 +449,6 @@
       flex-shrink: 0;
     }
 
-    /* Remove Song Button */
     .remove-btn {
       width: 28px;
       height: 28px;
@@ -528,7 +528,6 @@
   </header>
 
   <main class="theater-container">
-    <!-- Left Column: Video Stage & Info -->
     <section>
       <div class="stage-wrapper">
         <div class="ambient-glow" id="ambientGlow"></div>
@@ -537,6 +536,7 @@
             id="videoPlayer"
             src=""
             title="MOODIFY Music Video Player"
+            referrerpolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
           ></iframe>
@@ -547,7 +547,7 @@
         <div class="track-info">
           <div class="badge-row">
             <span class="mood-pill" id="currentMoodBadge">ENERGETIC</span>
-            <span class="live-tag" id="trackCounter">1 / 6 IN QUEUE</span>
+            <span class="live-tag" id="trackCounter">1 / 5 IN QUEUE</span>
           </div>
           <h1 id="currentTitle">Loading Video...</h1>
           <p id="currentArtist">Artist</p>
@@ -566,7 +566,6 @@
       </div>
     </section>
 
-    <!-- Right Column: Up Next Queue -->
     <aside class="queue-panel">
       <div class="queue-header">
         <h2>Up Next <span>Queue</span></h2>
@@ -603,13 +602,6 @@
         artist: 'Rick Astley',
         mood: 'Energetic',
         note: 'Classic upbeat 80s synth-pop energy with iconic choreography and bright studio visuals.'
-      },
-      {
-        id: 'jfKfPfyJRdk',
-        title: 'lofi hip hop radio — beats to relax/study to',
-        artist: 'Lofi Girl',
-        mood: 'Chill',
-        note: 'Warm, continuous downtempo instrumentals paired with cozy late-night study animation.'
       },
       {
         id: '4NRXx6U8ABQ',
@@ -721,11 +713,9 @@
       }
 
       if (wasCurrent) {
-        // Play the video that shifted into the current slot
         const nextIdx = idx >= videos.length ? 0 : idx;
         loadVideo(nextIdx, true);
       } else {
-        // Adjust currentIndex if an earlier song was removed
         if (idx < currentIndex) {
           currentIndex -= 1;
         }
@@ -772,10 +762,8 @@
           <button type="button" class="remove-btn" title="Remove from queue" aria-label="Remove ${video.title}">&times;</button>
         `;
 
-        // Play video on card click
         item.addEventListener('click', () => loadVideo(idx, true));
 
-        // Remove video on '×' click without triggering playback
         const removeBtn = item.querySelector('.remove-btn');
         removeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -786,7 +774,6 @@
       });
     }
 
-    // Event Listeners
     document.getElementById('customVideoForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const rawUrl = document.getElementById('youtubeInput').value;
@@ -854,7 +841,6 @@
       renderQueue();
     });
 
-    // Initialize first video without forced autoplay on initial load
     loadVideo(0, false);
   </script>
 </body>
