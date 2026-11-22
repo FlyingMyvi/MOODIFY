@@ -568,6 +568,30 @@ unset($track);
       justify-content: center;
       font-size: 34px;
       position: relative;
+      overflow: hidden;
+    }
+
+    .card-art > img,
+    .queue-thumb > img,
+    .apple-now-art > img,
+    .lcd-art > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      z-index: 1;
+    }
+
+    .card-art .status-badge,
+    .card-art .spotify-fab { z-index: 2; }
+
+    .queue-thumb,
+    .apple-now-art,
+    .lcd-art {
+      position: relative;
+      overflow: hidden;
     }
 
     .status-badge {
@@ -908,6 +932,45 @@ unset($track);
     // Terima data lagu dari PHP
     const tracks = <?php echo json_encode($tracksData, JSON_UNESCAPED_UNICODE); ?>;
 
+    // Local artwork downloaded by image.php (MOODIFY_IMAGES/songs)
+    const coverArtByTrackId = [
+      "MOODIFY_IMAGES/songs/01_as_it_was.jpg",
+      "MOODIFY_IMAGES/songs/02_i_think_he_knows.jpg",
+      "MOODIFY_IMAGES/songs/03_all_too_well_10_min.jpg",
+      "MOODIFY_IMAGES/songs/04_dancing_on_my_own.jpg",
+      "MOODIFY_IMAGES/songs/05_quit_playing_games.jpg",
+      "MOODIFY_IMAGES/songs/06_the_first_snow.jpg",
+      "MOODIFY_IMAGES/songs/07_just_us_2.jpg",
+      "MOODIFY_IMAGES/songs/08_psycho_red_velvet.jpg",
+      "MOODIFY_IMAGES/songs/09_so_lets_love.jpg",
+      "MOODIFY_IMAGES/songs/10_blind.jpg",
+      "MOODIFY_IMAGES/songs/11_like_i_want_you.jpg",
+      "MOODIFY_IMAGES/songs/12_i_swear_ill_never_leave_again.jpg",
+      "MOODIFY_IMAGES/songs/13_best_part.jpg",
+      "MOODIFY_IMAGES/songs/14_folded.jpg",
+      "MOODIFY_IMAGES/songs/15_open_arms.jpg",
+      "MOODIFY_IMAGES/songs/16_ingat.jpg",
+      "MOODIFY_IMAGES/songs/17_i_know.jpg",
+      "MOODIFY_IMAGES/songs/18_lose_my_mind.jpg",
+      "MOODIFY_IMAGES/songs/19_psycho_post_malone.jpg",
+      "MOODIFY_IMAGES/songs/20_luther.jpg"
+    ];
+
+    tracks.forEach(track => {
+      track.art = coverArtByTrackId[track.id] || '';
+    });
+
+    function coverMarkup(track) {
+      if (!track.art) return '';
+      const alt = String(track.title).replace(/"/g, '&quot;') + ' cover';
+      return `<img src="${track.art}" alt="${alt}" loading="lazy" onerror="this.remove()">`;
+    }
+
+    function setArtwork(element, track) {
+      element.innerHTML = `<span>${track.emoji}</span>${coverMarkup(track)}`;
+      element.style.background = track.color;
+    }
+
     const genres = [
       { name: "Pop", desc: "Futuristic synth & vocal hits", emoji: "✨", color: "linear-gradient(135deg, #1b1b2f, #CCCCFF)" },
       { name: "K-Pop", desc: "Seoul stadium anthems", emoji: "💜", color: "linear-gradient(135deg, #16162b, #CCCCFF)" },
@@ -992,12 +1055,35 @@ unset($track);
       return changed;
     }
 
+    function getRequestedTrackId() {
+      const raw = new URLSearchParams(window.location.search).get('play');
+      if (raw === null || raw === '') return null;
+      const id = Number(raw);
+      return Number.isInteger(id) && id >= 0 && id < tracks.length ? id : null;
+    }
+
+    function playRequestedTrack(id) {
+      if (id === null) return false;
+      const track = tracks[id];
+      if (!track) return false;
+      if (!track.exists) {
+        showNotice(`"${track.title}" has no MP3 yet.`);
+        return false;
+      }
+      loadTrackSource(id, true);
+      return true;
+    }
+
     function initApp() {
       renderSidebarLibrary();
       renderGenreCards(activeGenre);
       updateGeniusSection();
       updateAppleQueue();
-      loadTrackSource(0, false);
+
+      const requestedId = getRequestedTrackId();
+      if (!playRequestedTrack(requestedId)) {
+        loadTrackSource(0, false);
+      }
 
       if (window.location.hash === '#lyrics') {
         window.switchMainView('lyrics');
@@ -1009,6 +1095,9 @@ unset($track);
         renderGenreCards(activeGenre);
         updateGeniusSection();
         updateAppleQueue();
+        if (requestedId !== null && tracks[requestedId] && tracks[requestedId].exists && currentTrackIndex !== requestedId) {
+          loadTrackSource(requestedId, true);
+        }
       });
     }
 
@@ -1033,6 +1122,9 @@ unset($track);
           document.getElementById('playPauseBtn').textContent = '❚❚';
         }).catch(err => {
           console.error("Gagal mainkan audio:", err);
+          isPlaying = false;
+          document.getElementById('playPauseBtn').textContent = '▶';
+          showNotice(`Press ▶ to play "${t.title}".`);
         });
       }
     }
@@ -1071,6 +1163,7 @@ unset($track);
               ${t.exists ? 'MP3 READY' : 'NO MP3'}
             </span>
             ${t.emoji}
+            ${coverMarkup(t)}
             <button class="spotify-fab" onclick="event.stopPropagation(); window.selectAndPlayTrack(${t.id})">▶</button>
           </div>
           <h3>${t.title}</h3>
@@ -1094,6 +1187,7 @@ unset($track);
               ${t.exists ? 'MP3 READY' : 'NO MP3'}
             </span>
             ${t.emoji}
+            ${coverMarkup(t)}
             <button class="spotify-fab" onclick="event.stopPropagation(); window.selectAndPlayTrack(${t.id})">▶</button>
           </div>
           <h3>${t.title}</h3>
@@ -1110,6 +1204,11 @@ unset($track);
         return;
       }
       loadTrackSource(id, true);
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('play', String(id));
+        window.history.replaceState(null, '', url);
+      } catch (err) {}
     };
 
     window.playCurrentGenre = function() {
@@ -1125,13 +1224,11 @@ unset($track);
       const t = tracks[currentTrackIndex];
       document.getElementById('lcdTitle').textContent = t.title;
       document.getElementById('lcdArtist').textContent = `${t.artist} — ${t.genre}`;
-      document.getElementById('lcdArt').textContent = t.emoji;
-      document.getElementById('lcdArt').style.background = t.color;
+      setArtwork(document.getElementById('lcdArt'), t);
 
       document.getElementById('queueNowTitle').textContent = t.title;
       document.getElementById('queueNowArtist').textContent = `${t.artist} • ${t.genre}`;
-      document.getElementById('queueNowArt').textContent = t.emoji;
-      document.getElementById('queueNowArt').style.background = t.color;
+      setArtwork(document.getElementById('queueNowArt'), t);
     }
 
     function updateGeniusSection() {
@@ -1186,7 +1283,10 @@ unset($track);
       queueList.innerHTML = nextTracks.map((tr) => `
         <div class="queue-item" onclick="window.selectAndPlayTrack(${tr.id})">
           <div class="queue-item-left">
-            <div class="queue-thumb" style="background: ${tr.color}">${tr.emoji}</div>
+            <div class="queue-thumb" style="background: ${tr.color}">
+              <span>${tr.emoji}</span>
+              ${coverMarkup(tr)}
+            </div>
             <div class="queue-text">
               <h5>${tr.title}</h5>
               <span>${tr.artist} ${tr.exists ? '• MP3' : '• NO MP3'}</span>
