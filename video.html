@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOODIFY — Music Video Theater</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base: #0b0d14;
+      --bg-surface: #121622;
+      --bg-elevated: #1a2033;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #ff4d6d;
+      --accent-glow: rgba(255, 77, 109, 0.28);
+
+      --mood-love: #ff4d6d;
+      --mood-sad: #38bdf8;
+      --mood-energetic: #a855f7;
+      --mood-chill: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(168, 85, 247, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 85%, rgba(255, 77, 109, 0.07), transparent 40%);
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      background: rgba(11, 13, 20, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .brand small {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    /* Custom URL Bar */
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      max-width: 560px;
+    }
+
+    .url-bar input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .url-bar input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .url-bar select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.65rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, filter 0.2s;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+
+    /* Main Theater Layout */
+    .theater-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.75rem 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 385px;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    /* Video Stage */
+    .stage-wrapper {
+      position: relative;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      inset: 12px;
+      border-radius: 24px;
+      background: var(--accent);
+      filter: blur(48px);
+      opacity: 0.26;
+      z-index: 0;
+      transition: background 0.5s ease;
+      pointer-events: none;
+    }
+
+    .video-frame {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    .video-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* Now Playing Metadata Bar */
+    .track-meta {
+      position: relative;
+      z-index: 1;
+      margin-top: 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .track-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .mood-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent);
+      border: 1px solid currentColor;
+    }
+
+    .live-tag {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .track-info h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .track-info p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .icon-btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn.liked {
+      color: #ff4d6d;
+      border-color: rgba(255, 77, 109, 0.45);
+      background: rgba(255, 77, 109, 0.12);
+    }
+
+    /* Vibe / Session Notes Card */
+    .vibe-card {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .vibe-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .vibe-card p {
+      font-size: 0.96rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Queue Sidebar */
+    .queue-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: calc(100vh - 110px);
+      position: sticky;
+      top: 84px;
+    }
+
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .queue-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .queue-header h2 span {
+      color: var(--accent);
+    }
+
+    .queue-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .chip {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.32rem 0.72rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip.active,
+    .chip:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .queue-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .queue-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.6rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .queue-item:hover {
+      background: var(--bg-elevated);
+      transform: translateX(2px);
+    }
+
+    .queue-item.active {
+      background: var(--bg-elevated);
+      border-color: var(--accent);
+    }
+
+    .thumb-box {
+      position: relative;
+      width: 84px;
+      height: 50px;
+      border-radius: 9px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #000;
+    }
+
+    .thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .queue-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .queue-details h4 {
+      font-size: 0.87rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.22rem;
+    }
+
+    .queue-sub {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .queue-sub span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-mood-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Remove Song Button */
+    .remove-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.15s;
+    }
+
+    .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.16);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.4);
+      transform: scale(1.06);
+    }
+
+    .empty-queue {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+
+    @media (max-width: 980px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+      }
+      .url-bar {
+        max-width: 100%;
+      }
+      .theater-container {
+        grid-template-columns: 1fr;
+        padding: 1.25rem 1rem 2.5rem;
+      }
+      .queue-panel {
+        position: static;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      MOOD<span>IFY</span>
+      <small>VIDEO THEATER</small>
+    </div>
+
+    <form class="url-bar" id="customVideoForm">
+      <input
+        type="text"
+        id="youtubeInput"
+        placeholder="Paste any YouTube URL or 11-char Video ID..."
+        required
+      />
+      <select id="customMoodSelect" aria-label="Select mood">
+        <option value="Energetic">Energetic</option>
+        <option value="Chill">Chill</option>
+        <option value="Love">Love</option>
+        <option value="Sad">Sad</option>
+      </select>
+      <button type="submit" class="btn-primary">Play MV</button>
+    </form>
+  </header>
+
+  <main class="theater-container">
+    <!-- Left Column: Video Stage & Info -->
+    <section>
+      <div class="stage-wrapper">
+        <div class="ambient-glow" id="ambientGlow"></div>
+        <div class="video-frame">
+          <iframe
+            id="videoPlayer"
+            src=""
+            title="MOODIFY Music Video Player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="track-meta">
+        <div class="track-info">
+          <div class="badge-row">
+            <span class="mood-pill" id="currentMoodBadge">ENERGETIC</span>
+            <span class="live-tag" id="trackCounter">1 / 6 IN QUEUE</span>
+          </div>
+          <h1 id="currentTitle">Loading Video...</h1>
+          <p id="currentArtist">Artist</p>
+        </div>
+
+        <div class="track-actions">
+          <button class="icon-btn" id="prevBtn" title="Previous Video">⏮ Prev</button>
+          <button class="icon-btn" id="nextBtn" title="Next Video">Next ⏭</button>
+          <button class="icon-btn" id="likeBtn" title="Save to Liked">♡ Like</button>
+        </div>
+      </div>
+
+      <div class="vibe-card">
+        <h3>Mood & Visual Note</h3>
+        <p id="currentNote">Select a music video from the queue or paste a YouTube link above to start watching.</p>
+      </div>
+    </section>
+
+    <!-- Right Column: Up Next Queue -->
+    <aside class="queue-panel">
+      <div class="queue-header">
+        <h2>Up Next <span>Queue</span></h2>
+        <div class="queue-controls">
+          <button class="chip" id="resetBtn" title="Restore Default Videos">↺ Reset</button>
+          <button class="chip" id="shuffleBtn" title="Play Random Video">🔀 Shuffle</button>
+        </div>
+      </div>
+
+      <div class="filter-chips" id="moodFilters">
+        <button class="chip active" data-mood="All">All</button>
+        <button class="chip" data-mood="Energetic">Energetic</button>
+        <button class="chip" data-mood="Chill">Chill</button>
+        <button class="chip" data-mood="Love">Love</button>
+        <button class="chip" data-mood="Sad">Sad</button>
+      </div>
+
+      <div class="queue-list" id="queueList"></div>
+    </aside>
+  </main>
+
+  <script>
+    const MOOD_COLORS = {
+      Love: '#ff4d6d',
+      Sad: '#38bdf8',
+      Energetic: '#a855f7',
+      Chill: '#10b981'
+    };
+
+    const defaultVideos = [
+      {
+        id: 'dQw4w9WgXcQ',
+        title: 'Never Gonna Give You Up',
+        artist: 'Rick Astley',
+        mood: 'Energetic',
+        note: 'Classic upbeat 80s synth-pop energy with iconic choreography and bright studio visuals.'
+      },
+      {
+        id: 'jfKfPfyJRdk',
+        title: 'lofi hip hop radio — beats to relax/study to',
+        artist: 'Lofi Girl',
+        mood: 'Chill',
+        note: 'Warm, continuous downtempo instrumentals paired with cozy late-night study animation.'
+      },
+      {
+        id: '4NRXx6U8ABQ',
+        title: 'Blinding Lights (Official Video)',
+        artist: 'The Weeknd',
+        mood: 'Energetic',
+        note: 'High-speed neon cityscapes and retro synthwave momentum built for night drives.'
+      },
+      {
+        id: 'lp-EO5I60KA',
+        title: 'Thinking Out Loud (Official Music Video)',
+        artist: 'Ed Sheeran',
+        mood: 'Love',
+        note: 'Intimate ballroom spotlight choreography paired with warm acoustic soul.'
+      },
+      {
+        id: 'hLQl3WQQoQ0',
+        title: 'Someone Like You (Official Music Video)',
+        artist: 'Adele',
+        mood: 'Sad',
+        note: 'Monochrome Parisian riverside cinematography matching raw piano-led emotion.'
+      },
+      {
+        id: '5qap5aO4i9A',
+        title: 'Midnight Ambient Synth Session',
+        artist: 'MOODIFY Visuals',
+        mood: 'Chill',
+        note: 'Minimalist atmospheric textures designed for deep focus and late-night unwinding.'
+      }
+    ];
+
+    const savedVideos = JSON.parse(localStorage.getItem('moodify_custom_videos'));
+    let videos = Array.isArray(savedVideos) ? savedVideos : [...defaultVideos];
+    let likedIds = JSON.parse(localStorage.getItem('moodify_liked_videos')) || [];
+    let currentIndex = 0;
+    let activeFilter = 'All';
+
+    const playerEl = document.getElementById('videoPlayer');
+    const titleEl = document.getElementById('currentTitle');
+    const artistEl = document.getElementById('currentArtist');
+    const moodBadgeEl = document.getElementById('currentMoodBadge');
+    const counterEl = document.getElementById('trackCounter');
+    const noteEl = document.getElementById('currentNote');
+    const glowEl = document.getElementById('ambientGlow');
+    const likeBtn = document.getElementById('likeBtn');
+    const queueListEl = document.getElementById('queueList');
+
+    function saveVideos() {
+      localStorage.setItem('moodify_custom_videos', JSON.stringify(videos));
+    }
+
+    function extractYouTubeId(input) {
+      const trimmed = input.trim();
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+      const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+      const match = trimmed.match(regex);
+      return match ? match[1] : null;
+    }
+
+    function applyMoodTheme(mood) {
+      const color = MOOD_COLORS[mood] || '#ff4d6d';
+      document.documentElement.style.setProperty('--accent', color);
+      moodBadgeEl.textContent = mood.toUpperCase();
+      moodBadgeEl.style.color = color;
+      glowEl.style.background = color;
+    }
+
+    function clearStage() {
+      playerEl.src = '';
+      titleEl.textContent = 'Queue is Empty';
+      artistEl.textContent = 'Paste a YouTube link above or click Reset to restore songs';
+      counterEl.textContent = '0 / 0 IN QUEUE';
+      noteEl.textContent = 'No music videos left in your queue.';
+      applyMoodTheme('Energetic');
+      moodBadgeEl.textContent = 'EMPTY';
+      updateLikeButton();
+      renderQueue();
+    }
+
+    function loadVideo(index, autoplay = true) {
+      if (!videos.length) {
+        clearStage();
+        return;
+      }
+      currentIndex = (index + videos.length) % videos.length;
+      const track = videos[currentIndex];
+
+      const autoParam = autoplay ? '1' : '0';
+      playerEl.src = `https://www.youtube.com/embed/${track.id}?autoplay=${autoParam}&rel=0`;
+      titleEl.textContent = track.title;
+      artistEl.textContent = track.artist;
+      noteEl.textContent = track.note || `Streaming ${track.mood} mood visuals on MOODIFY Theater.`;
+      counterEl.textContent = `${currentIndex + 1} / ${videos.length} IN QUEUE`;
+
+      applyMoodTheme(track.mood);
+      updateLikeButton();
+      renderQueue();
+    }
+
+    function removeVideo(idx) {
+      const wasCurrent = idx === currentIndex;
+      videos.splice(idx, 1);
+      saveVideos();
+
+      if (!videos.length) {
+        currentIndex = 0;
+        clearStage();
+        return;
+      }
+
+      if (wasCurrent) {
+        // Play the video that shifted into the current slot
+        const nextIdx = idx >= videos.length ? 0 : idx;
+        loadVideo(nextIdx, true);
+      } else {
+        // Adjust currentIndex if an earlier song was removed
+        if (idx < currentIndex) {
+          currentIndex -= 1;
+        }
+        counterEl.textContent = `${currentIndex + 1} / ${videos.length} IN QUEUE`;
+        renderQueue();
+      }
+    }
+
+    function updateLikeButton() {
+      const current = videos[currentIndex];
+      const isLiked = current && likedIds.includes(current.id);
+      likeBtn.classList.toggle('liked', Boolean(isLiked));
+      likeBtn.textContent = isLiked ? '♥ Liked' : '♡ Like';
+    }
+
+    function renderQueue() {
+      queueListEl.innerHTML = '';
+
+      const filtered = videos
+        .map((video, idx) => ({ video, idx }))
+        .filter(({ video }) => activeFilter === 'All' || video.mood === activeFilter);
+
+      if (!filtered.length) {
+        queueListEl.innerHTML = `<div class="empty-queue">No videos in ${activeFilter === 'All' ? 'the queue' : `the "${activeFilter}" mood`}.</div>`;
+        return;
+      }
+
+      filtered.forEach(({ video, idx }) => {
+        const item = document.createElement('div');
+        item.className = `queue-item ${idx === currentIndex ? 'active' : ''}`;
+        const dotColor = MOOD_COLORS[video.mood] || '#ff4d6d';
+
+        item.innerHTML = `
+          <div class="thumb-box">
+            <img src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg" alt="${video.title}" loading="lazy" />
+          </div>
+          <div class="queue-details">
+            <h4>${video.title}</h4>
+            <div class="queue-sub">
+              <span class="queue-mood-dot" style="background:${dotColor}" title="${video.mood}"></span>
+              <span>${video.artist} • ${video.mood}</span>
+            </div>
+          </div>
+          <button type="button" class="remove-btn" title="Remove from queue" aria-label="Remove ${video.title}">&times;</button>
+        `;
+
+        // Play video on card click
+        item.addEventListener('click', () => loadVideo(idx, true));
+
+        // Remove video on '×' click without triggering playback
+        const removeBtn = item.querySelector('.remove-btn');
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeVideo(idx);
+        });
+
+        queueListEl.appendChild(item);
+      });
+    }
+
+    // Event Listeners
+    document.getElementById('customVideoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rawUrl = document.getElementById('youtubeInput').value;
+      const mood = document.getElementById('customMoodSelect').value;
+      const videoId = extractYouTubeId(rawUrl);
+
+      if (!videoId) {
+        alert('Please enter a valid YouTube link or 11-character video ID.');
+        return;
+      }
+
+      const existingIdx = videos.findIndex((v) => v.id === videoId);
+      if (existingIdx !== -1) {
+        loadVideo(existingIdx, true);
+      } else {
+        const newVideo = {
+          id: videoId,
+          title: `Custom Music Video (${videoId})`,
+          artist: 'YouTube Stream',
+          mood,
+          note: `Added directly to your ${mood} theater queue.`
+        };
+        videos.unshift(newVideo);
+        saveVideos();
+        loadVideo(0, true);
+      }
+      document.getElementById('youtubeInput').value = '';
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => loadVideo(currentIndex - 1, true));
+    document.getElementById('nextBtn').addEventListener('click', () => loadVideo(currentIndex + 1, true));
+
+    document.getElementById('shuffleBtn').addEventListener('click', () => {
+      if (videos.length < 2) return;
+      let rand;
+      do {
+        rand = Math.floor(Math.random() * videos.length);
+      } while (rand === currentIndex);
+      loadVideo(rand, true);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      videos = [...defaultVideos];
+      saveVideos();
+      loadVideo(0, false);
+    });
+
+    likeBtn.addEventListener('click', () => {
+      const current = videos[currentIndex];
+      if (!current) return;
+      if (likedIds.includes(current.id)) {
+        likedIds = likedIds.filter((id) => id !== current.id);
+      } else {
+        likedIds.push(current.id);
+      }
+      localStorage.setItem('moodify_liked_videos', JSON.stringify(likedIds));
+      updateLikeButton();
+    });
+
+    document.getElementById('moodFilters').addEventListener('click', (e) => {
+      if (!e.target.classList.contains('chip')) return;
+      document.querySelectorAll('#moodFilters .chip').forEach((c) => c.classList.remove('active'));
+      e.target.classList.add('active');
+      activeFilter = e.target.dataset.mood;
+      renderQueue();
+    });
+
+    // Initialize first video without forced autoplay on initial load
+    loadVideo(0, false);
+  </script>
+</body>
+</html>
