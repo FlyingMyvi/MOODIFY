@@ -293,11 +293,11 @@ unset($track);
       color: var(--text-primary);
       height: 100vh;
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 245px 1fr 320px;
       grid-template-rows: auto 1fr;
       grid-template-areas:
-        "header header"
-        "main queue";
+        "header header header"
+        "sidebar main queue";
       overflow: hidden;
     }
 
@@ -866,6 +866,7 @@ unset($track);
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
           "header"
+          "sidebar"
           "main"
           "queue";
         height: auto;
@@ -885,6 +886,11 @@ unset($track);
         gap: 10px 16px;
       }
 
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
       .main-view {
         overflow-y: visible;
         padding-bottom: 120px;
@@ -898,6 +904,7 @@ unset($track);
   </style>
 <link rel="stylesheet" href="logo.css" />
 <link rel="stylesheet" href="header.css?v=2" />
+<link rel="stylesheet" href="footer.css?v=1" />
 </head>
 <body>
 
@@ -910,8 +917,8 @@ unset($track);
           <a href="index.html">HOME</a>
           <a href="index.html#featured">FEATURED</a>
           <a href="index.html#charts">OUR MUSIC</a>
-          <a href="player.html?v=14#lyrics">LYRICS</a>
-          <a href="player.html?v=14" class="active" aria-current="page">AUDIO</a>
+          <a href="player.html?v=15#lyrics" data-player-view="lyrics">LYRICS</a>
+          <a href="player.html?v=15" class="active" aria-current="page" data-player-view="home">AUDIO</a>
           <a href="video.html">VIDEO</a>
           <a href="feedback.html">FEEDBACK</a>
           <a href="index.html#team">TEAM</a>
@@ -919,6 +926,20 @@ unset($track);
       </nav>
     </div>
   </header>
+
+  <aside class="sidebar">
+    <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
+
+    <div class="nav-group">
+      <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">Home</div>
+      <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">MOODIFY Live Lyrics</div>
+    </div>
+
+    <div class="library-section">
+      <div class="library-title">Playlists by Genre</div>
+      <div id="sidebarLibrary"></div>
+    </div>
+  </aside>
 
   <!-- CENTER VIEW -->
   <main class="main-view">
@@ -940,9 +961,6 @@ unset($track);
         </div>
         <button class="hero-play-btn" onclick="window.playCurrentGenre()">▶ Stream Playlist</button>
       </div>
-
-      <div class="library-title" style="padding-left: 0;">Playlists by Genre</div>
-      <div class="genre-strip" id="genreStrip"></div>
 
       <div class="section-header">
         <h2 id="feedHeading">Pop Playlists & Tracks</h2>
@@ -996,6 +1014,27 @@ unset($track);
       </div>
       <div id="lyricsLinesBox"></div>
     </div>
+
+    <footer class="global-footer">
+      <div class="footer-container">
+        <h2 class="moodify-logo moodify-logo-footer">MOODI<span>FY</span></h2>
+        <p>Music Beyond Boundaries.</p>
+
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="index.html#featured">Featured</a>
+          <a href="index.html#charts">Our Music</a>
+          <a href="index.html#artists">Artists</a>
+          <a href="index.html#team">Team</a>
+          <a href="player.html?v=15#lyrics">Lyrics</a>
+          <a href="player.html?v=15">Audio</a>
+          <a href="video.html">Video</a>
+          <a href="feedback.html">Feedback</a>
+        </div>
+
+        <p>&copy; 2026 MOODIFY. All rights reserved.</p>
+      </div>
+    </footer>
   </main>
 
   <!-- RIGHT QUEUE PANEL -->
@@ -1315,7 +1354,7 @@ unset($track);
     }
 
     function initApp() {
-      renderGenreStrip();
+      renderSidebarLibrary();
       renderGenreCards(activeGenre);
       updateGeniusSection();
       updateAppleQueue();
@@ -1329,11 +1368,28 @@ unset($track);
         window.switchMainView('lyrics');
       }
 
+      document.querySelectorAll('.global-header .nav-links a[data-player-view]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const view = link.dataset.playerView;
+          window.switchMainView(view);
+          const url = new URL(window.location.href);
+          url.hash = view === 'lyrics' ? 'lyrics' : '';
+          window.history.replaceState(null, '', url);
+        });
+      });
+
+      window.addEventListener('hashchange', () => {
+        window.switchMainView(
+          window.location.hash === '#lyrics' ? 'lyrics' : 'home'
+        );
+      });
+
       loadItunesArtwork();
 
       syncTrackExistence().then((changed) => {
         if (!changed) return;
-        renderGenreStrip();
+        renderSidebarLibrary();
         renderGenreCards(activeGenre);
         updateGeniusSection();
         updateAppleQueue();
@@ -1371,8 +1427,8 @@ unset($track);
       }
     }
 
-    function renderGenreStrip() {
-      const container = document.getElementById("genreStrip");
+    function renderSidebarLibrary() {
+      const container = document.getElementById("sidebarLibrary");
       container.innerHTML = genres.map(g => `
         <div class="lib-item ${g.name === activeGenre ? 'selected' : ''}" onclick="window.setGenreFilter('${g.name}')">
           <div class="lib-thumb ${g.imageClass}" aria-hidden="true"></div>
@@ -1388,7 +1444,7 @@ unset($track);
       activeGenre = genreName;
       document.getElementById('feedHeading').textContent = `${genreName} Playlists & Tracks`;
       document.getElementById('heroTitle').textContent = `${genreName} Future Mix`;
-      renderGenreStrip();
+      renderSidebarLibrary();
       renderGenreCards(genreName);
     };
 
@@ -1540,18 +1596,42 @@ unset($track);
       const lyricsView = document.getElementById("lyricsView");
       const tabHomeBtn = document.getElementById("tabHomeBtn");
       const tabLyricsBtn = document.getElementById("tabLyricsBtn");
+      const navHome = document.getElementById("navHome");
+      const navLyrics = document.getElementById("navLyrics");
+      const headerLyrics = document.querySelector('.global-header .nav-links a[data-player-view="lyrics"]');
+      const headerAudio = document.querySelector('.global-header .nav-links a[data-player-view="home"]');
 
       if (viewName === 'lyrics') {
         homeView.style.display = 'none';
         lyricsView.classList.add('active');
         tabHomeBtn.classList.remove('active');
         tabLyricsBtn.classList.add('active');
+        if (navHome) navHome.classList.remove('active');
+        if (navLyrics) navLyrics.classList.add('active');
+        if (headerLyrics) {
+          headerLyrics.classList.add('active');
+          headerLyrics.setAttribute('aria-current', 'page');
+        }
+        if (headerAudio) {
+          headerAudio.classList.remove('active');
+          headerAudio.removeAttribute('aria-current');
+        }
         renderLiveLyrics();
       } else {
         homeView.style.display = 'block';
         lyricsView.classList.remove('active');
         tabHomeBtn.classList.add('active');
         tabLyricsBtn.classList.remove('active');
+        if (navHome) navHome.classList.add('active');
+        if (navLyrics) navLyrics.classList.remove('active');
+        if (headerAudio) {
+          headerAudio.classList.add('active');
+          headerAudio.setAttribute('aria-current', 'page');
+        }
+        if (headerLyrics) {
+          headerLyrics.classList.remove('active');
+          headerLyrics.removeAttribute('aria-current');
+        }
       }
     };
 

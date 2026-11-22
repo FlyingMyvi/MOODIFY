@@ -665,6 +665,7 @@ footer p {
 </style>
 <link rel="stylesheet" href="logo.css" />
 <link rel="stylesheet" href="header.css?v=2" />
+<link rel="stylesheet" href="footer.css?v=1" />
 </head>
 
 <body>
@@ -680,8 +681,8 @@ footer p {
                 <a href="index.html">HOME</a>
                 <a href="index.html#featured">FEATURED</a>
                 <a href="index.html#charts">OUR MUSIC</a>
-                <a href="player.html?v=14#lyrics">LYRICS</a>
-                <a href="player.html?v=14">AUDIO</a>
+                <a href="player.html?v=15#lyrics">LYRICS</a>
+                <a href="player.html?v=15">AUDIO</a>
                 <a href="video.html">VIDEO</a>
                 <a href="feedback.html">FEEDBACK</a>
                 <a href="index.html#team">TEAM</a>
@@ -1201,20 +1202,20 @@ footer p {
 
 <!-- FOOTER -->
 
-<footer>
-    <div class="container">
+<footer class="global-footer">
+    <div class="footer-container">
 
         <h2 class="moodify-logo moodify-logo-footer">MOODI<span>FY</span></h2>
         <p>Music Beyond Boundaries.</p>
 
         <div class="footer-links">
-            <a href="#home">Home</a>
-            <a href="#featured">Featured</a>
-            <a href="#charts">Our Music</a>
-            <a href="#artists">Artists</a>
-            <a href="#team">Team</a>
-            <a href="player.html?v=14#lyrics">Lyrics</a>
-            <a href="player.html?v=14">Audio</a>
+            <a href="index.html">Home</a>
+            <a href="index.html#featured">Featured</a>
+            <a href="index.html#charts">Our Music</a>
+            <a href="index.html#artists">Artists</a>
+            <a href="index.html#team">Team</a>
+            <a href="player.html?v=15#lyrics">Lyrics</a>
+            <a href="player.html?v=15">Audio</a>
             <a href="video.html">Video</a>
             <a href="feedback.html">Feedback</a>
         </div>
@@ -1295,7 +1296,7 @@ document.querySelectorAll(".music-list").forEach(function(list) {
 
         function openTrack() {
             window.location.href =
-                "player.html?v=14&play=" + trackId;
+                "player.html?v=15&play=" + trackId;
         }
 
         row.addEventListener("click", openTrack);
