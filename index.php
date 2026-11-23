@@ -917,8 +917,8 @@ unset($track);
           <a href="index.html">HOME</a>
           <a href="index.html#featured">FEATURED</a>
           <a href="index.html#charts">OUR MUSIC</a>
-          <a href="player.html?v=15#lyrics" data-player-view="lyrics">LYRICS</a>
-          <a href="player.html?v=15" class="active" aria-current="page" data-player-view="home">AUDIO</a>
+          <a href="player.html?v=16#lyrics" data-player-view="lyrics">LYRICS</a>
+          <a href="player.html?v=16" class="active" aria-current="page" data-player-view="home">AUDIO</a>
           <a href="video.html">VIDEO</a>
           <a href="feedback.html">FEEDBACK</a>
           <a href="index.html#team">TEAM</a>
@@ -928,8 +928,6 @@ unset($track);
   </header>
 
   <aside class="sidebar">
-    <a href="index.html" class="moodify-logo moodify-logo-sm">MOODI<span>FY</span></a>
-
     <div class="nav-group">
       <div class="nav-item active" id="navHome" onclick="window.switchMainView('home')">Home</div>
       <div class="nav-item" id="navLyrics" onclick="window.switchMainView('lyrics')">MOODIFY Live Lyrics</div>
@@ -1026,8 +1024,8 @@ unset($track);
           <a href="index.html#charts">Our Music</a>
           <a href="index.html#artists">Artists</a>
           <a href="index.html#team">Team</a>
-          <a href="player.html?v=15#lyrics">Lyrics</a>
-          <a href="player.html?v=15">Audio</a>
+          <a href="player.html?v=16#lyrics">Lyrics</a>
+          <a href="player.html?v=16">Audio</a>
           <a href="video.html">Video</a>
           <a href="feedback.html">Feedback</a>
         </div>
