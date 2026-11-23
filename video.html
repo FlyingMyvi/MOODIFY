@@ -91,6 +91,28 @@
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
+    .url-bar select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.65rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .url-bar select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .url-bar select option {
+      background: #111116;
+      color: #f5f3ee;
+    }
+
     .btn-primary {
       background: var(--accent);
       color: #09090c;
@@ -213,6 +235,31 @@
     .track-info p {
       color: var(--text-secondary);
       font-size: 0.92rem;
+    }
+
+    .vibe-card {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .vibe-card h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .vibe-card p {
+      font-size: 0.96rem;
+      line-height: 1.6;
+      color: var(--text-primary);
     }
 
     .track-actions {
@@ -484,9 +531,16 @@
       <input
         type="text"
         id="youtubeInput"
-        placeholder="Paste any YouTube URL..."
+        placeholder="Paste any YouTube URL or 11-char Video ID..."
         required
       />
+
+      <select id="customMoodSelect" aria-label="Select genre">
+        <option value="Pop">Pop</option>
+        <option value="Kpop">Kpop</option>
+        <option value="Rnb">Rnb</option>
+        <option value="Hip hop">Hip hop</option>
+      </select>
 
       <button type="submit" class="btn-primary">Play MV</button>
     </form>
@@ -513,8 +567,8 @@
       <div class="track-meta">
         <div class="track-info">
           <div class="badge-row">
-            <span class="mood-pill" id="currentMoodBadge">ENERGETIC</span>
-            <span class="live-tag" id="trackCounter">1 / 5 IN QUEUE</span>
+            <span class="mood-pill" id="currentMoodBadge">POP</span>
+            <span class="live-tag" id="trackCounter">0 / 0 IN QUEUE</span>
           </div>
 
           <h1 id="currentTitle">Loading Video...</h1>
@@ -526,6 +580,11 @@
           <button class="icon-btn" id="nextBtn" title="Next Video">Next ⏭</button>
           <button class="icon-btn" id="likeBtn" title="Save to Liked">♡ Like</button>
         </div>
+      </div>
+
+      <div class="vibe-card">
+        <h3>Genre &amp; Track Note</h3>
+        <p id="currentNote">Select a music video from the queue or paste a YouTube link above to start watching.</p>
       </div>
 
     </section>
@@ -543,11 +602,10 @@
 
       <div class="filter-chips" id="moodFilters">
         <button class="chip active" data-mood="All">All</button>
-        <button class="chip" data-mood="Energetic">Energetic</button>
-        <button class="chip" data-mood="Chill">Chill</button>
-        <button class="chip" data-mood="Love">Love</button>
-        <button class="chip" data-mood="Sad">Sad</button>
-        <button class="chip" data-mood="Custom">Custom</button>
+        <button class="chip" data-mood="Pop">Pop</button>
+        <button class="chip" data-mood="Kpop">Kpop</button>
+        <button class="chip" data-mood="Rnb">Rnb</button>
+        <button class="chip" data-mood="Hip hop">Hip hop</button>
       </div>
 
       <div class="queue-list" id="queueList"></div>
@@ -577,71 +635,179 @@
   </footer>
 
   <script>
-    const MOOD_COLORS = {
-      Love: '#f5f3ee',
-      Sad: '#b8c4e6',
-      Energetic: '#ccccff',
-      Chill: '#c7d2dd',
+    const GENRE_COLORS = {
+      Pop: '#ccccff',
+      Kpop: '#f5f3ee',
+      Rnb: '#b8c4e6',
+      'Hip hop': '#c7d2dd',
       Custom: '#aaa9b2'
     };
 
+    const STORAGE_KEY = 'moodify_queue_v3';
+    const INITIALIZED_KEY = 'moodify_queue_initialized_v3';
+
     const defaultVideos = [
+      // POP
       {
-        id: 'dQw4w9WgXcQ',
-        title: 'Never Gonna Give You Up',
-        artist: 'Rick Astley',
-        mood: 'Energetic'
+        id: 'H5v3kku4y6Q',
+        title: 'As It Was',
+        artist: 'Harry Styles',
+        mood: 'Pop',
+        note: 'Pop track by Harry Styles.'
       },
       {
-        id: '4NRXx6U8ABQ',
-        title: 'Blinding Lights (Official Video)',
-        artist: 'The Weeknd',
-        mood: 'Energetic'
+        id: '2d1wKn-oJnA',
+        title: 'I Think He Knows',
+        artist: 'Taylor Swift',
+        mood: 'Pop',
+        note: 'Pop track by Taylor Swift.'
       },
       {
-        id: 'lp-EO5I60KA',
-        title: 'Thinking Out Loud (Official Music Video)',
-        artist: 'Ed Sheeran',
-        mood: 'Love'
+        id: 'aPnqx56V8-0',
+        title: 'All Too Well (10 Minute Version)',
+        artist: 'Taylor Swift',
+        mood: 'Pop',
+        note: 'Pop track by Taylor Swift.'
       },
       {
-        id: 'hLQl3WQQoQ0',
-        title: 'Someone Like You (Official Music Video)',
-        artist: 'Adele',
-        mood: 'Sad'
+        id: '88GEqrziSJQ',
+        title: 'Dancing On My Own',
+        artist: 'Robyn',
+        mood: 'Pop',
+        note: 'Pop track by Robyn.'
       },
       {
-        id: 'MrmPDUvKyLs',
-        title: '505',
-        artist: 'Arctic Monkeys',
-        mood: 'Chill'
+        id: 'Ug88HO2mg44',
+        title: 'Quit Playing Games (With My Heart)',
+        artist: 'Backstreet Boys',
+        mood: 'Pop',
+        note: 'Pop track by Backstreet Boys.'
+      },
+
+      // KPOP
+      {
+        id: 'qxrpa1mKpAk',
+        title: 'The First Snow',
+        artist: 'EXO',
+        mood: 'Kpop',
+        note: 'Kpop track by EXO.'
+      },
+      {
+        id: 'SKAsHxi1Tlc',
+        title: 'Just us 2 (Feat. Gaeko)',
+        artist: 'EXO-SC',
+        mood: 'Kpop',
+        note: 'Kpop track by EXO-SC.'
+      },
+      {
+        id: 'Z7yNvMzz2zg',
+        title: 'Psycho',
+        artist: 'Red Velvet',
+        mood: 'Kpop',
+        note: 'Kpop track by Red Velvet.'
+      },
+      {
+        id: 'iM8U6n1hyK8',
+        title: "so let's love",
+        artist: 'DAY6',
+        mood: 'Kpop',
+        note: 'Kpop track by DAY6.'
+      },
+      {
+        id: 'LLsYWbL-IEc',
+        title: 'Blind',
+        artist: 'ENHYPEN',
+        mood: 'Kpop',
+        note: 'Kpop track by ENHYPEN.'
+      },
+
+      // RNB
+      {
+        id: 'ixmD1koVjq0',
+        title: 'Like I Want You',
+        artist: 'GIVĒON',
+        mood: 'Rnb',
+        note: 'Rnb track by GIVĒON.'
+      },
+      {
+        id: 'AJ75-7IIjRs',
+        title: "i swear i'll never leave again",
+        artist: 'keshi',
+        mood: 'Rnb',
+        note: 'Rnb track by keshi.'
+      },
+      {
+        id: 'zNhtz0Lygik',
+        title: 'Best Part (feat. H.E.R.)',
+        artist: 'Daniel Caesar',
+        mood: 'Rnb',
+        note: 'Rnb track by Daniel Caesar.'
+      },
+      {
+        id: 'gbZHBYMXooQ',
+        title: 'Folded',
+        artist: 'Kehlani',
+        mood: 'Rnb',
+        note: 'Rnb track by Kehlani.'
+      },
+      {
+        id: 'JLd09jmEAYA',
+        title: 'Open Arms (ft. Travis Scott)',
+        artist: 'SZA',
+        mood: 'Rnb',
+        note: 'Rnb track by SZA.'
+      },
+
+      // HIP HOP
+      {
+        id: 'l-Z8PWbAveU',
+        title: 'I KNOW ?',
+        artist: 'Travis Scott',
+        mood: 'Hip hop',
+        note: 'Hip hop track by Travis Scott.'
+      },
+      {
+        id: 'whbczRUgYQw',
+        title: 'Lose My Mind (feat. Doja Cat)',
+        artist: 'Don Toliver',
+        mood: 'Hip hop',
+        note: 'Hip hop track by Don Toliver.'
+      },
+      {
+        id: 'hDv0TPk5eqU',
+        title: 'Psycho (ft. Ty Dolla $ign)',
+        artist: 'Post Malone',
+        mood: 'Hip hop',
+        note: 'Hip hop track by Post Malone.'
+      },
+      {
+        id: 'eRaGG-ZKgdw',
+        title: 'luther',
+        artist: 'Kendrick Lamar & SZA',
+        mood: 'Hip hop',
+        note: 'Hip hop track by Kendrick Lamar & SZA.'
       }
     ];
 
-    const savedVideos = JSON.parse(
-      localStorage.getItem('moodify_custom_videos')
-    );
+    function loadInitialVideos() {
+      const hasInitialized = localStorage.getItem(INITIALIZED_KEY) === 'true';
+      if (!hasInitialized) {
+        const initial = [...defaultVideos];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+        localStorage.setItem(INITIALIZED_KEY, 'true');
+        return initial;
+      }
 
-    let videos = Array.isArray(savedVideos)
-      ? savedVideos
-      : [...defaultVideos];
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
 
-    // Convert previously added custom videos to the Custom tag.
-    videos = videos.map((video) => {
-      const isCustomVideo =
-        video.artist === 'YouTube Stream' &&
-        typeof video.title === 'string' &&
-        video.title.startsWith('Custom Music Video');
-
-      return isCustomVideo
-        ? { ...video, mood: 'Custom' }
-        : video;
-    });
-
-    let likedIds = JSON.parse(
-      localStorage.getItem('moodify_liked_videos')
-    ) || [];
-
+    let videos = loadInitialVideos();
+    let likedIds = JSON.parse(localStorage.getItem('moodify_liked_videos')) || [];
     let currentIndex = 0;
     let activeFilter = 'All';
 
@@ -650,64 +816,40 @@
     const artistEl = document.getElementById('currentArtist');
     const moodBadgeEl = document.getElementById('currentMoodBadge');
     const counterEl = document.getElementById('trackCounter');
+    const noteEl = document.getElementById('currentNote');
     const glowEl = document.getElementById('ambientGlow');
     const likeBtn = document.getElementById('likeBtn');
     const queueListEl = document.getElementById('queueList');
 
     function saveVideos() {
-      localStorage.setItem(
-        'moodify_custom_videos',
-        JSON.stringify(videos)
-      );
-    }
-
-    // Save older custom videos after updating their tags.
-    if (Array.isArray(savedVideos)) {
-      localStorage.setItem(
-        'moodify_custom_videos',
-        JSON.stringify(videos)
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+      localStorage.setItem(INITIALIZED_KEY, 'true');
     }
 
     function extractYouTubeId(input) {
       const trimmed = input.trim();
-
-      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
-        return trimmed;
-      }
-
-      const regex =
-        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+      const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
       const match = trimmed.match(regex);
-
       return match ? match[1] : null;
     }
 
-    function applyMoodTheme(mood) {
-      const color = MOOD_COLORS[mood] || '#ccccff';
-
+    function applyGenreTheme(genre) {
+      const color = GENRE_COLORS[genre] || '#ccccff';
       document.documentElement.style.setProperty('--accent', color);
-
-      moodBadgeEl.textContent = mood.toUpperCase();
+      moodBadgeEl.textContent = genre.toUpperCase();
       moodBadgeEl.style.color = color;
       glowEl.style.background = color;
     }
 
     function clearStage() {
       playerEl.src = '';
-
       titleEl.textContent = 'Queue is Empty';
-
-      artistEl.textContent =
-        'Paste a YouTube link above or click Reset to restore songs';
-
+      artistEl.textContent = 'Paste a YouTube link above or click Reset to restore default songs';
       counterEl.textContent = '0 / 0 IN QUEUE';
-
-      applyMoodTheme('Energetic');
-
+      noteEl.textContent = 'All songs were removed from your queue. Your empty queue is saved across tab reloads.';
+      applyGenreTheme('Pop');
       moodBadgeEl.textContent = 'EMPTY';
-
       updateLikeButton();
       renderQueue();
     }
@@ -717,33 +859,24 @@
         clearStage();
         return;
       }
-
       currentIndex = (index + videos.length) % videos.length;
-
       const track = videos[currentIndex];
 
       const autoParam = autoplay ? '1' : '0';
-
-      playerEl.src =
-        `https://www.youtube.com/embed/${track.id}?autoplay=${autoParam}&rel=0`;
-
+      playerEl.src = `https://www.youtube.com/embed/${track.id}?autoplay=${autoParam}&rel=0`;
       titleEl.textContent = track.title;
       artistEl.textContent = track.artist;
+      noteEl.textContent = track.note || `${track.mood} track on MOODIFY Theater.`;
+      counterEl.textContent = `${currentIndex + 1} / ${videos.length} IN QUEUE`;
 
-      counterEl.textContent =
-        `${currentIndex + 1} / ${videos.length} IN QUEUE`;
-
-      applyMoodTheme(track.mood);
-
+      applyGenreTheme(track.mood);
       updateLikeButton();
       renderQueue();
     }
 
     function removeVideo(idx) {
       const wasCurrent = idx === currentIndex;
-
       videos.splice(idx, 1);
-
       saveVideos();
 
       if (!videos.length) {
@@ -759,24 +892,16 @@
         if (idx < currentIndex) {
           currentIndex -= 1;
         }
-
-        counterEl.textContent =
-          `${currentIndex + 1} / ${videos.length} IN QUEUE`;
-
+        counterEl.textContent = `${currentIndex + 1} / ${videos.length} IN QUEUE`;
         renderQueue();
       }
     }
 
     function updateLikeButton() {
       const current = videos[currentIndex];
-
-      const isLiked =
-        current && likedIds.includes(current.id);
-
+      const isLiked = current && likedIds.includes(current.id);
       likeBtn.classList.toggle('liked', Boolean(isLiked));
-
-      likeBtn.textContent =
-        isLiked ? '♥ Liked' : '♡ Like';
+      likeBtn.textContent = isLiked ? '♥ Liked' : '♡ Like';
     }
 
     function renderQueue() {
@@ -784,72 +909,35 @@
 
       const filtered = videos
         .map((video, idx) => ({ video, idx }))
-        .filter(({ video }) => {
-          return activeFilter === 'All' ||
-            video.mood === activeFilter;
-        });
+        .filter(({ video }) => activeFilter === 'All' || video.mood === activeFilter);
 
       if (!filtered.length) {
-        queueListEl.innerHTML = `
-          <div class="empty-queue">
-            No videos in ${
-              activeFilter === 'All'
-                ? 'the queue'
-                : `the "${activeFilter}" queue`
-            }.
-          </div>
-        `;
-
+        queueListEl.innerHTML = `<div class="empty-queue">No videos in ${activeFilter === 'All' ? 'the queue' : `the "${activeFilter}" genre`}.</div>`;
         return;
       }
 
       filtered.forEach(({ video, idx }) => {
         const item = document.createElement('div');
-
-        item.className =
-          `queue-item ${idx === currentIndex ? 'active' : ''}`;
-
-        const dotColor =
-          MOOD_COLORS[video.mood] || '#ccccff';
+        item.className = `queue-item ${idx === currentIndex ? 'active' : ''}`;
+        const dotColor = GENRE_COLORS[video.mood] || '#ccccff';
 
         item.innerHTML = `
           <div class="thumb-box">
-            <img
-              src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg"
-              alt="${video.title}"
-              loading="lazy"
-            />
+            <img src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg" alt="${video.title}" loading="lazy" />
           </div>
-
           <div class="queue-details">
             <h4>${video.title}</h4>
-
             <div class="queue-sub">
-              <span
-                class="queue-mood-dot"
-                style="background:${dotColor}"
-                title="${video.mood}"
-              ></span>
-
+              <span class="queue-mood-dot" style="background:${dotColor}" title="${video.mood}"></span>
               <span>${video.artist} • ${video.mood}</span>
             </div>
           </div>
-
-          <button
-            type="button"
-            class="remove-btn"
-            title="Remove from queue"
-            aria-label="Remove ${video.title}"
-          >&times;</button>
+          <button type="button" class="remove-btn" title="Remove from queue" aria-label="Remove ${video.title}">&times;</button>
         `;
 
-        item.addEventListener('click', () => {
-          loadVideo(idx, true);
-        });
+        item.addEventListener('click', () => loadVideo(idx, true));
 
-        const removeBtn =
-          item.querySelector('.remove-btn');
-
+        const removeBtn = item.querySelector('.remove-btn');
         removeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           removeVideo(idx);
@@ -859,142 +947,77 @@
       });
     }
 
-    // Add custom YouTube videos with the Custom tag.
-    document
-      .getElementById('customVideoForm')
-      .addEventListener('submit', (e) => {
+    document.getElementById('customVideoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rawUrl = document.getElementById('youtubeInput').value;
+      const mood = document.getElementById('customMoodSelect').value;
+      const videoId = extractYouTubeId(rawUrl);
 
-        e.preventDefault();
+      if (!videoId) {
+        alert('Please enter a valid YouTube link or 11-character video ID.');
+        return;
+      }
 
-        const rawUrl =
-          document.getElementById('youtubeInput').value;
-
-        const videoId = extractYouTubeId(rawUrl);
-
-        if (!videoId) {
-          alert(
-            'Please enter a valid YouTube link or 11-character video ID.'
-          );
-
-          return;
-        }
-
-        const existingIdx = videos.findIndex(
-          (v) => v.id === videoId
-        );
-
-        if (existingIdx !== -1) {
-          loadVideo(existingIdx, true);
-        } else {
-          const newVideo = {
-            id: videoId,
-            title: `Custom Music Video (${videoId})`,
-            artist: 'YouTube Stream',
-            mood: 'Custom'
-          };
-
-          videos.unshift(newVideo);
-
-          saveVideos();
-
-          loadVideo(0, true);
-        }
-
-        document.getElementById('youtubeInput').value = '';
-      });
-
-    // Previous video.
-    document.getElementById('prevBtn')
-      .addEventListener('click', () => {
-        loadVideo(currentIndex - 1, true);
-      });
-
-    // Next video.
-    document.getElementById('nextBtn')
-      .addEventListener('click', () => {
-        loadVideo(currentIndex + 1, true);
-      });
-
-    // Shuffle videos.
-    document.getElementById('shuffleBtn')
-      .addEventListener('click', () => {
-
-        if (videos.length < 2) return;
-
-        let rand;
-
-        do {
-          rand = Math.floor(
-            Math.random() * videos.length
-          );
-        } while (rand === currentIndex);
-
-        loadVideo(rand, true);
-      });
-
-    // Reset playlist.
-    document.getElementById('resetBtn')
-      .addEventListener('click', () => {
-
-        videos = [...defaultVideos];
-
+      const existingIdx = videos.findIndex((v) => v.id === videoId);
+      if (existingIdx !== -1) {
+        loadVideo(existingIdx, true);
+      } else {
+        const newVideo = {
+          id: videoId,
+          title: 'Custom Music Video',
+          artist: 'YouTube Stream',
+          mood,
+          note: 'Added directly to your queue.'
+        };
+        videos.unshift(newVideo);
         saveVideos();
+        loadVideo(0, true);
+      }
+      document.getElementById('youtubeInput').value = '';
+    });
 
-        activeFilter = 'All';
+    document.getElementById('prevBtn').addEventListener('click', () => loadVideo(currentIndex - 1, true));
+    document.getElementById('nextBtn').addEventListener('click', () => loadVideo(currentIndex + 1, true));
 
-        document.querySelectorAll('#moodFilters .chip')
-          .forEach((chip) => {
-            chip.classList.toggle(
-              'active',
-              chip.dataset.mood === 'All'
-            );
-          });
+    document.getElementById('shuffleBtn').addEventListener('click', () => {
+      if (videos.length < 2) return;
+      let rand;
+      do {
+        rand = Math.floor(Math.random() * videos.length);
+      } while (rand === currentIndex);
+      loadVideo(rand, true);
+    });
 
-        loadVideo(0, false);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      videos = [...defaultVideos];
+      saveVideos();
+      activeFilter = 'All';
+      document.querySelectorAll('#moodFilters .chip').forEach((chip) => {
+        chip.classList.toggle('active', chip.dataset.mood === 'All');
       });
+      loadVideo(0, false);
+    });
 
-    // Like button.
     likeBtn.addEventListener('click', () => {
       const current = videos[currentIndex];
-
       if (!current) return;
-
       if (likedIds.includes(current.id)) {
-        likedIds = likedIds.filter(
-          (id) => id !== current.id
-        );
+        likedIds = likedIds.filter((id) => id !== current.id);
       } else {
         likedIds.push(current.id);
       }
-
-      localStorage.setItem(
-        'moodify_liked_videos',
-        JSON.stringify(likedIds)
-      );
-
+      localStorage.setItem('moodify_liked_videos', JSON.stringify(likedIds));
       updateLikeButton();
     });
 
-    // Mood and Custom playlist filters.
-    document.getElementById('moodFilters')
-      .addEventListener('click', (e) => {
+    document.getElementById('moodFilters').addEventListener('click', (e) => {
+      if (!e.target.classList.contains('chip')) return;
+      document.querySelectorAll('#moodFilters .chip').forEach((c) => c.classList.remove('active'));
+      e.target.classList.add('active');
+      activeFilter = e.target.dataset.mood;
+      renderQueue();
+    });
 
-        if (!e.target.classList.contains('chip')) return;
-
-        document
-          .querySelectorAll('#moodFilters .chip')
-          .forEach((c) => {
-            c.classList.remove('active');
-          });
-
-        e.target.classList.add('active');
-
-        activeFilter = e.target.dataset.mood;
-
-        renderQueue();
-      });
-
-    // Load first video.
     loadVideo(0, false);
 
   </script>
