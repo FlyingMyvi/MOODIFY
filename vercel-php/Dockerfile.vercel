@@ -8,6 +8,7 @@ RUN apt-get update \
 COPY index.html /var/www/html/index.html
 COPY feedback.php /var/www/html/feedback.php
 COPY feedback-list.php /var/www/html/feedback-list.php
+COPY comments.php /var/www/html/comments.php
 
 RUN printf 'DirectoryIndex index.html\n' > /etc/apache2/conf-available/moodify.conf \
     && a2enconf moodify

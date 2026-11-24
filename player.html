@@ -664,8 +664,8 @@
           <a href="index.html">HOME</a>
           <a href="index.html#featured">FEATURED</a>
           <a href="index.html#charts">OUR MUSIC</a>
-          <a href="player.html?v=17#lyrics" data-player-view="lyrics">LYRICS</a>
-          <a href="player.html?v=17" class="active" aria-current="page" data-player-view="home">AUDIO</a>
+          <a href="player.html?v=18#lyrics" data-player-view="lyrics">LYRICS</a>
+          <a href="player.html?v=18" class="active" aria-current="page" data-player-view="home">AUDIO</a>
           <a href="video.html">VIDEO</a>
           <a href="feedback.html">FEEDBACK</a>
           <a href="index.html#team">TEAM</a>
@@ -772,8 +772,8 @@
           <a href="index.html#charts">Our Music</a>
           <a href="index.html#artists">Artists</a>
           <a href="index.html#team">Team</a>
-          <a href="player.html?v=17#lyrics">Lyrics</a>
-          <a href="player.html?v=17">Audio</a>
+          <a href="player.html?v=18#lyrics">Lyrics</a>
+          <a href="player.html?v=18">Audio</a>
           <a href="video.html">Video</a>
           <a href="feedback.html">Feedback</a>
         </div>
@@ -1380,6 +1380,10 @@
         );
       });
 
+      setInterval(() => {
+        if (!document.hidden) refreshTrackComments(true);
+      }, 60000);
+
       loadItunesArtwork();
 
       syncTrackExistence().then((changed) => {
@@ -1541,11 +1545,15 @@
       document.getElementById('annotationTrackTitle').textContent = `${t.title} — Meaning & Feedback`;
       document.getElementById('geniusAnnotationText').textContent = t.annotation;
       renderFeedbackList();
+      refreshTrackComments();
     }
 
     const FEEDBACK_STORAGE_KEY = 'moodify_track_feedback_v1';
     const FEEDBACK_NAME_KEY = 'moodify_feedback_username';
     const MAX_COMMENT_LENGTH = 280;
+    const COMMENTS_ENDPOINT = location.protocol === 'file:'
+      ? ''
+      : 'https://moodify-php.vercel.app/comments.php';
 
     function readStoredFeedback() {
       try {
@@ -1559,14 +1567,16 @@
     }
 
     let trackFeedback = readStoredFeedback();
+    let lastCommentFetch = { key: null, at: 0 };
+    let commentRequestId = 0;
 
     function activeTrackKey() {
       const t = tracks[currentTrackIndex];
       return String(t && t.id !== undefined ? t.id : currentTrackIndex);
     }
 
-    function getTrackComments() {
-      const list = trackFeedback[activeTrackKey()];
+    function getTrackComments(key = activeTrackKey()) {
+      const list = trackFeedback[key];
       return Array.isArray(list) ? list : [];
     }
 
@@ -1576,6 +1586,94 @@
       } catch (err) {
         console.warn('Could not save comment:', err);
       }
+    }
+
+    function setTrackComments(key, comments) {
+      trackFeedback[key] = comments.slice(0, 200);
+      saveTrackFeedback();
+    }
+
+    function addCachedComment(key, comment) {
+      const comments = getTrackComments(key);
+      comments.unshift(comment);
+      setTrackComments(key, comments);
+    }
+
+    function removeCachedComment(key, id) {
+      setTrackComments(key, getTrackComments(key).filter((comment) => comment.id !== id));
+    }
+
+    async function fetchServerComments(trackId) {
+      if (!COMMENTS_ENDPOINT) return null;
+
+      const response = await fetch(COMMENTS_ENDPOINT + '?track=' + encodeURIComponent(trackId), {
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-store'
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('Comments endpoint is unavailable.');
+      }
+
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || 'Could not load comments.');
+      }
+
+      return Array.isArray(data.comments) ? data.comments : [];
+    }
+
+    async function refreshTrackComments(force = false) {
+      if (!COMMENTS_ENDPOINT) return;
+
+      const key = activeTrackKey();
+      const now = Date.now();
+      if (!force && lastCommentFetch.key === key && now - lastCommentFetch.at < 5000) {
+        return;
+      }
+      lastCommentFetch = { key, at: now };
+      const requestId = ++commentRequestId;
+
+      try {
+        const remote = await fetchServerComments(key);
+        if (remote === null || requestId !== commentRequestId || key !== activeTrackKey()) {
+          return;
+        }
+
+        const pending = getTrackComments(key).filter((comment) => comment && comment.pending);
+        setTrackComments(key, pending.concat(remote));
+        renderFeedbackList();
+      } catch (err) {
+        console.warn('Could not load shared comments:', err);
+      }
+    }
+
+    async function postServerComment(trackId, name, text) {
+      if (!COMMENTS_ENDPOINT) {
+        throw new Error('Shared comments are not configured.');
+      }
+
+      const response = await fetch(COMMENTS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ track: Number(trackId), name, text })
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('Comments endpoint is unavailable.');
+      }
+
+      const data = await response.json();
+      if (!response.ok || !data.ok || !data.comment) {
+        throw new Error(data.error || 'Could not post comment.');
+      }
+
+      return data.comment;
     }
 
     function formatCommentTime(value) {
@@ -1617,7 +1715,10 @@
 
         const time = document.createElement('span');
         time.className = 'feedback-meta';
-        time.textContent = formatCommentTime(comment.at);
+        const timeText = formatCommentTime(comment.at);
+        time.textContent = comment.pending
+          ? (timeText ? timeText + ' · pending sync' : 'pending sync')
+          : timeText;
         if (time.textContent) item.appendChild(time);
 
         const text = document.createElement('div');
@@ -1630,14 +1731,14 @@
       list.appendChild(fragment);
     }
 
-    window.addFeedback = function(event) {
+    window.addFeedback = async function(event) {
       event.preventDefault();
       const nameInput = document.getElementById('feedbackName');
       const input = document.getElementById('feedbackInput');
       if (!nameInput || !input) return;
 
-      const name = nameInput.value.trim().replace(/\s+/g, ' ');
-      const text = input.value.trim();
+      const name = nameInput.value.trim().replace(/\s+/g, ' ').slice(0, 24);
+      const text = input.value.trim().replace(/\s+/g, ' ').slice(0, MAX_COMMENT_LENGTH);
 
       if (!name) {
         nameInput.focus();
@@ -1648,24 +1749,39 @@
         return;
       }
 
-      const comments = getTrackComments();
-      comments.unshift({
-        user: name.slice(0, 24),
-        text: text.slice(0, MAX_COMMENT_LENGTH),
-        at: new Date().toISOString()
-      });
-
-      trackFeedback[activeTrackKey()] = comments.slice(0, 200);
-      saveTrackFeedback();
+      const key = activeTrackKey();
+      const submitBtn = document.querySelector('.feedback-btn');
+      const optimistic = {
+        id: 'local-' + Date.now() + '-' + Math.random().toString(16).slice(2, 8),
+        user: name,
+        text: text,
+        at: new Date().toISOString(),
+        pending: true
+      };
 
       try {
-        localStorage.setItem(FEEDBACK_NAME_KEY, name.slice(0, 24));
+        localStorage.setItem(FEEDBACK_NAME_KEY, name);
       } catch (err) {
         console.warn('Could not remember username:', err);
       }
 
       input.value = '';
-      renderFeedbackList();
+      addCachedComment(key, optimistic);
+      if (key === activeTrackKey()) renderFeedbackList();
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const saved = await postServerComment(key, name, text);
+        removeCachedComment(key, optimistic.id);
+        addCachedComment(key, saved);
+        lastCommentFetch = { key, at: Date.now() };
+      } catch (err) {
+        console.warn('Could not share comment:', err);
+        showNotice('Comment saved on this device. Shared comments are unavailable right now.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (key === activeTrackKey()) renderFeedbackList();
+      }
     };
 
     function updateAppleQueue() {
