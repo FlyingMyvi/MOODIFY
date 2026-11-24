@@ -491,8 +491,15 @@
     .feedback-list { max-height: 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .feedback-item { background: var(--bg-black); border: 1px solid rgba(255, 255, 255, 0.07); padding: 8px 10px; border-radius: 8px; font-size: 12px; }
     .feedback-item strong { color: var(--accent-pop); font-size: 11px; }
-    .feedback-form { display: flex; gap: 6px; }
-    .feedback-input { flex: 1; background: var(--bg-black); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 7px 10px; color: #fff; font-size: 12px; outline: none; }
+    .feedback-item .feedback-text { margin-top: 3px; color: var(--text-secondary); line-height: 1.5; word-break: break-word; }
+    .feedback-item .feedback-meta { margin-left: 6px; color: var(--text-secondary); font-size: 10px; font-weight: 400; }
+    .feedback-empty { color: var(--text-secondary); font-size: 12px; line-height: 1.5; padding: 10px 0; }
+    .feedback-form { display: flex; flex-wrap: wrap; gap: 6px; }
+    .feedback-input { flex: 1 1 140px; min-width: 0; background: var(--bg-black); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 7px 10px; color: #fff; font-size: 12px; outline: none; }
+    .feedback-name-input { flex: 1 1 120px; }
+    .feedback-message-input { flex: 1 1 100%; }
+    .feedback-input::placeholder { color: var(--text-secondary); }
+    .feedback-input:focus { border-color: var(--accent-pop); }
     .feedback-btn { background: var(--accent-pop); color: var(--text-on-accent); border: none; border-radius: 8px; padding: 0 12px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
     /* ================= LIVE LYRICS VIEW ================= */
@@ -657,8 +664,8 @@
           <a href="index.html">HOME</a>
           <a href="index.html#featured">FEATURED</a>
           <a href="index.html#charts">OUR MUSIC</a>
-          <a href="player.html?v=16#lyrics" data-player-view="lyrics">LYRICS</a>
-          <a href="player.html?v=16" class="active" aria-current="page" data-player-view="home">AUDIO</a>
+          <a href="player.html?v=17#lyrics" data-player-view="lyrics">LYRICS</a>
+          <a href="player.html?v=17" class="active" aria-current="page" data-player-view="home">AUDIO</a>
           <a href="video.html">VIDEO</a>
           <a href="feedback.html">FEEDBACK</a>
           <a href="index.html#team">TEAM</a>
@@ -726,9 +733,10 @@
           </div>
           <div class="annotation-card" id="geniusAnnotationText"></div>
           <div class="feedback-list" id="feedbackList"></div>
-          <form class="feedback-form" onsubmit="window.addFeedback(event)">
-            <input type="text" id="feedbackInput" class="feedback-input" placeholder="Drop your review or lyric breakdown..." required />
+          <form class="feedback-form" id="feedbackForm" onsubmit="window.addFeedback(event)">
+            <input type="text" id="feedbackName" class="feedback-input feedback-name-input" placeholder="Username" maxlength="24" autocomplete="nickname" required />
             <button type="submit" class="feedback-btn">Post</button>
+            <input type="text" id="feedbackInput" class="feedback-input feedback-message-input" placeholder="Drop your review or lyric breakdown..." maxlength="280" required />
           </form>
         </div>
       </div>
@@ -764,8 +772,8 @@
           <a href="index.html#charts">Our Music</a>
           <a href="index.html#artists">Artists</a>
           <a href="index.html#team">Team</a>
-          <a href="player.html?v=16#lyrics">Lyrics</a>
-          <a href="player.html?v=16">Audio</a>
+          <a href="player.html?v=17#lyrics">Lyrics</a>
+          <a href="player.html?v=17">Audio</a>
           <a href="video.html">Video</a>
           <a href="feedback.html">Feedback</a>
         </div>
@@ -858,12 +866,6 @@
         "emoji":  "✨",
         "color":  "linear-gradient(135deg, #1b1b2f, #CCCCFF)",
         "annotation":  "Genius Verified: A bittersweet synth-pop anthem about emotional isolation and transition.",
-        "feedback":  [
-                         {
-                             "user":  "@PopFan",
-                             "text":  "Vibes lagu ni memang tak pernah bosan!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -876,12 +878,6 @@
         "emoji":  "💖",
         "color":  "linear-gradient(135deg, #2b1b26, #ffcce6)",
         "annotation":  "Genius Verified: Upbeat falsetto-heavy track capturing the spark of a new crush.",
-        "feedback":  [
-                         {
-                             "user":  "@Swiftie99",
-                             "text":  "Lover album punya hidden gem ni!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -894,12 +890,6 @@
         "emoji":  "🧣",
         "color":  "linear-gradient(135deg, #261b1b, #ffd9cc)",
         "annotation":  "Genius Verified: A lyrical masterpiece depicting emotional storytelling and heartbreak.",
-        "feedback":  [
-                         {
-                             "user":  "@SadGirlAutumn",
-                             "text":  "10 minit pun tak terasa lama."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -912,12 +902,6 @@
         "emoji":  "🪩",
         "color":  "linear-gradient(135deg, #1b262b, #cce6ff)",
         "annotation":  "Genius Verified: The ultimate club heartbreak anthem.",
-        "feedback":  [
-                         {
-                             "user":  "@DanceVibes",
-                             "text":  "Menitis air mata dengar lagu ni."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -930,12 +914,6 @@
         "emoji":  "🌹",
         "color":  "linear-gradient(135deg, #2a2015, #ffedd5)",
         "annotation":  "Genius Verified: 90s boyband pop perfection.",
-        "feedback":  [
-                         {
-                             "user":  "@RetroKing",
-                             "text":  "Nostalgia zaman 90an!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -948,12 +926,6 @@
         "emoji":  "❄️",
         "color":  "linear-gradient(135deg, #16222b, #cce6ff)",
         "annotation":  "Genius Verified: EXO\u0027s iconic winter seasonal masterpiece.",
-        "feedback":  [
-                         {
-                             "user":  "@Exo_L",
-                             "text":  "Wajib dengar setiap kali musim salji/hujan!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -966,12 +938,6 @@
         "emoji":  "🎧",
         "color":  "linear-gradient(135deg, #1c1b2b, #e0cffc)",
         "annotation":  "Genius Verified: Chill summer hip-hop/pop vibe by Sehun \u0026 Chanyeol.",
-        "feedback":  [
-                         {
-                             "user":  "@Sehunnie",
-                             "text":  "Beat santai gila."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -984,12 +950,6 @@
         "emoji":  "🦇",
         "color":  "linear-gradient(135deg, #2b1616, #ffcccc)",
         "annotation":  "Genius Verified: Dark orchestral pop hook and intricate vocal layering.",
-        "feedback":  [
-                         {
-                             "user":  "@ReVeluv",
-                             "text":  "Queen of velvet concept!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1002,12 +962,6 @@
         "emoji":  "🎸",
         "color":  "linear-gradient(135deg, #282b16, #f2ffcc)",
         "annotation":  "Genius Verified: Melodic rock-pop anthem about holding on through hardships.",
-        "feedback":  [
-                         {
-                             "user":  "@MyDay",
-                             "text":  "DAY6 lagu band memang tak pernah gagal."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1020,12 +974,6 @@
         "emoji":  "🖤",
         "color":  "linear-gradient(135deg, #181818, #d4d4d4)",
         "annotation":  "Genius Verified: Dark atmospheric modern pop-R\u0026B crossover.",
-        "feedback":  [
-                         {
-                             "user":  "@Engene",
-                             "text":  "Vocal line dia gila sedap."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1038,12 +986,6 @@
         "emoji":  "🤎",
         "color":  "linear-gradient(135deg, #2b221b, #fce4cc)",
         "annotation":  "Genius Verified: Deep baritone soulful R\u0026B masterpiece.",
-        "feedback":  [
-                         {
-                             "user":  "@RnBFan",
-                             "text":  "Baritone voice dia smooth sangat."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1056,12 +998,6 @@
         "emoji":  "🥀",
         "color":  "linear-gradient(135deg, #261b22, #fcdce8)",
         "annotation":  "Genius Verified: Intimate lo-fi bedroom R\u0026B aesthetics.",
-        "feedback":  [
-                         {
-                             "user":  "@KeshiStan",
-                             "text":  "Lagu tidur paling best."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1074,12 +1010,6 @@
         "emoji":  "☀️",
         "color":  "linear-gradient(135deg, #2b2816, #fcf6cc)",
         "annotation":  "Genius Verified: Acoustic neo-soul duet classic.",
-        "feedback":  [
-                         {
-                             "user":  "@SoulVibes",
-                             "text":  "Aura romantik dia memang top tier."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1092,12 +1022,6 @@
         "emoji":  "🕊️",
         "color":  "linear-gradient(135deg, #1b212b, #cce0ff)",
         "annotation":  "Genius Verified: Smooth contemporary R\u0026B vocal delivery.",
-        "feedback":  [
-                         {
-                             "user":  "@KehlaniDaily",
-                             "text":  "Vocals clean gila!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1110,12 +1034,6 @@
         "emoji":  "🌅",
         "color":  "linear-gradient(135deg, #2b1b22, #ffd6e0)",
         "annotation":  "Genius Verified: Ethereal and vulnerable modern R\u0026B collaboration.",
-        "feedback":  [
-                         {
-                             "user":  "@SzaUpdate",
-                             "text":  "Collab SZA \u0026 Travis selalu on point."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1128,12 +1046,6 @@
         "emoji":  "🔥",
         "color":  "linear-gradient(135deg, #2b1b1b, #ffcccc)",
         "annotation":  "Genius Verified: Southeast Asian hip-hop/R\u0026B fusion hit with catchy hooks.",
-        "feedback":  [
-                         {
-                             "user":  "@MalaysianHipHop",
-                             "text":  "Alyph beat memang selalu power!"
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1146,12 +1058,6 @@
         "emoji":  "🌵",
         "color":  "linear-gradient(135deg, #211b2b, #e2ccff)",
         "annotation":  "Genius Verified: Standout hypnotic trap production from Utopia.",
-        "feedback":  [
-                         {
-                             "user":  "@TravisFan",
-                             "text":  "Utopia album punya highlight ni."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1164,12 +1070,6 @@
         "emoji":  "🌀",
         "color":  "linear-gradient(135deg, #1b2b2b, #ccfffa)",
         "annotation":  "Genius Verified: Melodic rap rhythm and atmospheric synth melodies.",
-        "feedback":  [
-                         {
-                             "user":  "@RapCaviar",
-                             "text":  "Vibe driving malam."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1182,12 +1082,6 @@
         "emoji":  "💊",
         "color":  "linear-gradient(135deg, #2b2416, #ffeacc)",
         "annotation":  "Genius Verified: Laid-back trap beat paired with melodic cadence.",
-        "feedback":  [
-                         {
-                             "user":  "@PostyNation",
-                             "text":  "Classic timeless banger."
-                         }
-                     ],
         "exists":  true
     },
     {
@@ -1200,12 +1094,6 @@
         "emoji":  "👑",
         "color":  "linear-gradient(135deg, #1b1b2b, #ccccff)",
         "annotation":  "Genius Verified: Soul-sampled lyrical hip-hop mastery.",
-        "feedback":  [
-                         {
-                             "user":  "@KendrickStan",
-                             "text":  "Lagu ni punya sample memang gila sedap."
-                         }
-                     ],
         "exists":  true
     }
 ];
@@ -1453,6 +1341,14 @@
     }
 
     function initApp() {
+      try {
+        const savedName = localStorage.getItem(FEEDBACK_NAME_KEY);
+        const nameInput = document.getElementById('feedbackName');
+        if (savedName && nameInput) nameInput.value = savedName;
+      } catch (err) {
+        console.warn('Could not restore username:', err);
+      }
+
       renderSidebarLibrary();
       renderGenreCards(activeGenre);
       updateGeniusSection();
@@ -1647,23 +1543,128 @@
       renderFeedbackList();
     }
 
-    function renderFeedbackList() {
+    const FEEDBACK_STORAGE_KEY = 'moodify_track_feedback_v1';
+    const FEEDBACK_NAME_KEY = 'moodify_feedback_username';
+    const MAX_COMMENT_LENGTH = 280;
+
+    function readStoredFeedback() {
+      try {
+        const raw = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : {};
+        return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      } catch (err) {
+        console.warn('Could not read saved comments:', err);
+        return {};
+      }
+    }
+
+    let trackFeedback = readStoredFeedback();
+
+    function activeTrackKey() {
       const t = tracks[currentTrackIndex];
-      const list = document.getElementById("feedbackList");
-      list.innerHTML = t.feedback.map(f => `
-        <div class="feedback-item">
-          <strong>${f.user}</strong>: ${f.text}
-        </div>
-      `).join('');
+      return String(t && t.id !== undefined ? t.id : currentTrackIndex);
+    }
+
+    function getTrackComments() {
+      const list = trackFeedback[activeTrackKey()];
+      return Array.isArray(list) ? list : [];
+    }
+
+    function saveTrackFeedback() {
+      try {
+        localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(trackFeedback));
+      } catch (err) {
+        console.warn('Could not save comment:', err);
+      }
+    }
+
+    function formatCommentTime(value) {
+      const time = new Date(value).getTime();
+      if (!Number.isFinite(time)) return '';
+      const minutes = Math.floor((Date.now() - time) / 60000);
+      if (minutes < 1) return 'just now';
+      if (minutes < 60) return minutes + 'm ago';
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return hours + 'h ago';
+      const days = Math.floor(hours / 24);
+      if (days < 7) return days + 'd ago';
+      return new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function renderFeedbackList() {
+      const list = document.getElementById('feedbackList');
+      if (!list) return;
+
+      const comments = getTrackComments();
+      list.textContent = '';
+
+      if (comments.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'feedback-empty';
+        empty.textContent = 'No comments on this track yet. Add yours below.';
+        list.appendChild(empty);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      comments.forEach((comment) => {
+        const item = document.createElement('div');
+        item.className = 'feedback-item';
+
+        const author = document.createElement('strong');
+        author.textContent = comment.user || 'Listener';
+        item.appendChild(author);
+
+        const time = document.createElement('span');
+        time.className = 'feedback-meta';
+        time.textContent = formatCommentTime(comment.at);
+        if (time.textContent) item.appendChild(time);
+
+        const text = document.createElement('div');
+        text.className = 'feedback-text';
+        text.textContent = comment.text || '';
+        item.appendChild(text);
+
+        fragment.appendChild(item);
+      });
+      list.appendChild(fragment);
     }
 
     window.addFeedback = function(event) {
       event.preventDefault();
-      const input = document.getElementById("feedbackInput");
-      const val = input.value.trim();
-      if (!val) return;
-      tracks[currentTrackIndex].feedback.unshift({ user: "@You (Listener)", text: val });
-      input.value = "";
+      const nameInput = document.getElementById('feedbackName');
+      const input = document.getElementById('feedbackInput');
+      if (!nameInput || !input) return;
+
+      const name = nameInput.value.trim().replace(/\s+/g, ' ');
+      const text = input.value.trim();
+
+      if (!name) {
+        nameInput.focus();
+        return;
+      }
+      if (!text) {
+        input.focus();
+        return;
+      }
+
+      const comments = getTrackComments();
+      comments.unshift({
+        user: name.slice(0, 24),
+        text: text.slice(0, MAX_COMMENT_LENGTH),
+        at: new Date().toISOString()
+      });
+
+      trackFeedback[activeTrackKey()] = comments.slice(0, 200);
+      saveTrackFeedback();
+
+      try {
+        localStorage.setItem(FEEDBACK_NAME_KEY, name.slice(0, 24));
+      } catch (err) {
+        console.warn('Could not remember username:', err);
+      }
+
+      input.value = '';
       renderFeedbackList();
     };
 
