@@ -252,7 +252,6 @@ $refreshUrl = 'feedback-list.php' . ($adminKey !== '' ? '?key=' . rawurlencode($
             background:var(--panel);
             border:1px solid var(--border);
         }
-        .footer-note { margin-top:16px; color:var(--grey); font-size:11px; }
         @media (max-width:700px) {
             body { padding:18px; }
             .topbar { align-items:flex-start; flex-direction:column; }
@@ -321,10 +320,6 @@ $refreshUrl = 'feedback-list.php' . ($adminKey !== '' ? '?key=' . rawurlencode($
             </table>
         </div>
     <?php endif; ?>
-
-    <p class="footer-note">
-        Data source: <?= getenv('BLOB_READ_WRITE_TOKEN') ? 'Vercel Blob (moodify-feedback)' : 'local feedback-data/feedback.json' ?>
-    </p>
 </div>
 </body>
 </html>

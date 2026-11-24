@@ -987,10 +987,6 @@ footer p {
                         <dt>Reference</dt>
                         <dd id="successRef"></dd>
                     </div>
-                    <div>
-                        <dt>Storage</dt>
-                        <dd id="successStorage"></dd>
-                    </div>
                 </dl>
 
                 <button type="button" class="ghost-btn" id="anotherBtn">Send another feedback</button>
@@ -1094,7 +1090,6 @@ footer p {
     const successType = document.getElementById('successType');
     const successMessage = document.getElementById('successMessage');
     const successDate = document.getElementById('successDate');
-    const successStorage = document.getElementById('successStorage');
 
     const fields = {
         name: document.getElementById('name'),
@@ -1301,7 +1296,6 @@ footer p {
         successType.textContent = payload.type;
         successMessage.textContent = payload.message;
         successDate.textContent = formatDateTime(new Date(result.submittedAt || payload.submittedAt));
-        successStorage.textContent = result.storage;
         successPanel.focus();
     }
 
