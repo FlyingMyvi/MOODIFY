@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090c">
+<title>MOODIFY PHP Backend</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600&family=Outfit:wght@800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #09090c;
+  --panel: #111116;
+  --lavender: #ccccff;
+  --cream: #f5f3ee;
+  --grey: #aaa9b2;
+  --border: rgba(255,255,255,0.12);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(204,204,255,0.12), transparent 40%),
+    var(--black);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  padding: 32px;
+}
+.card {
+  width: min(620px, 100%);
+  padding: 40px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+h1 {
+  margin: 12px 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+p { color: var(--grey); line-height: 1.7; }
+.kicker {
+  color: var(--lavender);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+a { color: var(--lavender); }
+code {
+  color: var(--cream);
+  background: #08080c;
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--lavender);
+  font-size: 12px;
+  font-weight: 600;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lavender);
+  box-shadow: 0 0 12px var(--lavender);
+}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="kicker">MOODIFY / PHP</div>
+  <h1>Feedback backend is running.</h1>
+  <p>The PHP endpoint is live and connected to a private Vercel Blob store.</p>
+  <p>POST JSON to <code>/feedback.php</code>. The MOODIFY feedback form can use this endpoint from GitHub Pages.</p>
+  <div class="status"><span class="dot"></span> PHP 8.4 + Apache running on Vercel</div>
+  <p><a href="https://flyingmyvi.github.io/MOODIFY/">Open the MOODIFY site</a></p>
+</main>
+</body>
+</html>

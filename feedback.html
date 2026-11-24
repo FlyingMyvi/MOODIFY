@@ -1072,7 +1072,11 @@ footer p {
 
     const STORAGE_KEY = 'moodify_feedback_submissions';
     const MAX_MESSAGE = 1500;
-    const isStaticHost = location.hostname.endsWith('github.io') || location.protocol === 'file:';
+    const VERCEL_FEEDBACK_ENDPOINT = 'https://moodify-php.vercel.app/feedback.php';
+    const useVercelEndpoint = location.hostname.endsWith('github.io');
+    const feedbackEndpoint = useVercelEndpoint
+        ? VERCEL_FEEDBACK_ENDPOINT
+        : 'feedback.php';
 
     const form = document.getElementById('feedbackForm');
     const formStatus = document.getElementById('formStatus');
@@ -1252,9 +1256,7 @@ footer p {
     }
 
     async function submitToServer(payload) {
-        if (isStaticHost) return null;
-
-        const response = await fetch('feedback.php', {
+        const response = await fetch(feedbackEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

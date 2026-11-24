@@ -1,0 +1,14 @@
+FROM php:8.4-apache
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libonig-dev \
+    && docker-php-ext-install mbstring \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY index.html /var/www/html/index.html
+COPY feedback.php /var/www/html/feedback.php
+
+RUN printf 'DirectoryIndex index.html\n' > /etc/apache2/conf-available/moodify.conf \
+    && a2enconf moodify
+
+EXPOSE 80
