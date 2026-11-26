@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 header('Content-Type: application/json; charset=utf-8');
@@ -126,8 +125,7 @@ if (stripos($contentType, 'application/json') !== false) {
     $input = $_POST;
 }
 
-$honeypot = text_field($input, 'website', 200);
-if ($honeypot !== '') {
+if (text_field($input, 'website', 200) !== '') {
     respond(422, ['ok' => false, 'error' => 'Unable to submit this form.']);
 }
 
@@ -181,7 +179,6 @@ $record = [
     'type' => $type,
     'message' => $message,
     'submitted_at' => $submittedAt,
-    'source' => 'vercel-feedback',
 ];
 
 if (!store_in_blob($record)) {

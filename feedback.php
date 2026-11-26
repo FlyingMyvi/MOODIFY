@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 header('Content-Type: application/json; charset=utf-8');
@@ -44,8 +43,7 @@ function text_field(array $input, string $key, int $maxLength): string
     return mb_substr($value, 0, $maxLength);
 }
 
-$honeypot = text_field($input, 'website', 200);
-if ($honeypot !== '') {
+if (text_field($input, 'website', 200) !== '') {
     respond(422, ['ok' => false, 'error' => 'Unable to submit this form.']);
 }
 
@@ -99,7 +97,6 @@ $record = [
     'type' => $type,
     'message' => $message,
     'submitted_at' => $submittedAt,
-    'source' => 'feedback.html',
 ];
 
 $dataDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'feedback-data';

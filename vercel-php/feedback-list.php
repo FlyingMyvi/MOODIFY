@@ -82,17 +82,6 @@ function load_blob_feedback(): array
     return $records;
 }
 
-function load_local_feedback(): array
-{
-    $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'feedback-data' . DIRECTORY_SEPARATOR . 'feedback.json';
-    if (!is_file($path)) {
-        return [];
-    }
-
-    $data = json_decode((string) file_get_contents($path), true);
-    return is_array($data) ? $data : [];
-}
-
 $adminKey = getenv('FEEDBACK_ADMIN_KEY') ?: '';
 $providedKey = isset($_GET['key']) && is_string($_GET['key']) ? $_GET['key'] : '';
 
@@ -140,9 +129,6 @@ if ($adminKey !== '' && !hash_equals($adminKey, $providedKey)) {
 }
 
 $records = load_blob_feedback();
-if ($records === [] && (getenv('BLOB_READ_WRITE_TOKEN') === false || getenv('BLOB_READ_WRITE_TOKEN') === '')) {
-    $records = load_local_feedback();
-}
 
 usort($records, function (array $a, array $b): int {
     $aTime = strtotime((string) ($a['submitted_at'] ?? '')) ?: 0;

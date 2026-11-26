@@ -8,80 +8,6 @@ function h(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function http_get(string $url, array $headers): array
-{
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'GET',
-            'header' => implode("\r\n", $headers),
-            'timeout' => 15,
-            'ignore_errors' => true,
-        ],
-    ]);
-
-    $body = @file_get_contents($url, false, $context);
-    $status = 0;
-
-    if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $matches)) {
-        $status = (int) $matches[1];
-    }
-
-    return [$status, is_string($body) ? $body : ''];
-}
-
-function load_blob_feedback(): array
-{
-    $token = getenv('BLOB_READ_WRITE_TOKEN');
-    if (!is_string($token) || $token === '') {
-        return [];
-    }
-
-    $parts = explode('_', $token);
-    $storeId = $parts[3] ?? '';
-    if ($storeId === '') {
-        return [];
-    }
-
-    $headers = [
-        'Authorization: Bearer ' . $token,
-        'x-api-version: 13',
-        'x-vercel-blob-store-id: ' . $storeId,
-    ];
-
-    [$status, $body] = http_get('https://blob.vercel-storage.com/?limit=100', $headers);
-    if ($status < 200 || $status >= 300) {
-        return [];
-    }
-
-    $data = json_decode($body, true);
-    $blobs = is_array($data['blobs'] ?? null) ? $data['blobs'] : [];
-    $records = [];
-
-    foreach ($blobs as $blob) {
-        $pathname = (string) ($blob['pathname'] ?? '');
-        if (!str_starts_with($pathname, 'feedback/')) {
-            continue;
-        }
-
-        $url = (string) ($blob['downloadUrl'] ?? $blob['url'] ?? '');
-        if ($url === '') {
-            continue;
-        }
-
-        [$fileStatus, $fileBody] = http_get($url, $headers);
-        if ($fileStatus < 200 || $fileStatus >= 300) {
-            continue;
-        }
-
-        $record = json_decode($fileBody, true);
-        if (is_array($record)) {
-            $records[] = $record;
-        }
-    }
-
-    return $records;
-}
-
 function load_local_feedback(): array
 {
     $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'feedback-data' . DIRECTORY_SEPARATOR . 'feedback.json';
@@ -139,10 +65,7 @@ if ($adminKey !== '' && !hash_equals($adminKey, $providedKey)) {
     exit;
 }
 
-$records = load_blob_feedback();
-if ($records === [] && (getenv('BLOB_READ_WRITE_TOKEN') === false || getenv('BLOB_READ_WRITE_TOKEN') === '')) {
-    $records = load_local_feedback();
-}
+$records = load_local_feedback();
 
 usort($records, function (array $a, array $b): int {
     $aTime = strtotime((string) ($a['submitted_at'] ?? '')) ?: 0;

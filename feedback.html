@@ -27,7 +27,6 @@
     --border: rgba(255,255,255,0.12);
     --border-strong: rgba(204,204,255,0.28);
     --error: #ff9d9d;
-    --success: #b9f5c8;
 }
 
 * {
@@ -408,12 +407,6 @@ nav {
     line-height: 1.5;
 }
 
-.form-status.success {
-    border-color: rgba(185,245,200,0.35);
-    background: rgba(185,245,200,0.07);
-    color: var(--success);
-}
-
 .form-footer {
     display: flex;
     align-items: center;
@@ -781,8 +774,8 @@ footer p {
                 <a href="index.html">HOME</a>
                 <a href="index.html#featured">FEATURED</a>
                 <a href="index.html#charts">OUR MUSIC</a>
-                <a href="player.html?v=19#lyrics">LYRICS</a>
-                <a href="player.html?v=19">AUDIO</a>
+                <a href="player.html?v=20#lyrics">LYRICS</a>
+                <a href="player.html?v=20">AUDIO</a>
                 <a href="video.html">VIDEO</a>
                 <a href="feedback.html" class="active" aria-current="page">FEEDBACK</a>
                 <a href="index.html#team">TEAM</a>
@@ -935,7 +928,7 @@ footer p {
                         <span id="submitLabel">Send Feedback</span>
                         <span class="arrow" aria-hidden="true">&rarr;</span>
                     </button>
-                    <p class="storage-note" id="storageNote">
+                    <p class="storage-note">
                         Submissions are stored on the server when PHP is available;
                         otherwise they are saved in this browser.
                     </p>
@@ -1044,8 +1037,8 @@ footer p {
             <a href="index.html#charts">Our Music</a>
             <a href="index.html#artists">Artists</a>
             <a href="index.html#team">Team</a>
-            <a href="player.html?v=19#lyrics">Lyrics</a>
-            <a href="player.html?v=19">Audio</a>
+            <a href="player.html?v=20#lyrics">Lyrics</a>
+            <a href="player.html?v=20">Audio</a>
             <a href="video.html">Video</a>
             <a href="feedback.html">Feedback</a>
         </div>
@@ -1110,23 +1103,19 @@ footer p {
 
     function updateDateTime(date = new Date()) {
         dateTimeInput.value = formatDateTime(date);
-        dateTimeInput.dataset.iso = date.toISOString();
     }
 
     function updateCharCount() {
         charCount.textContent = `${fields.message.value.length} / ${MAX_MESSAGE}`;
     }
 
-    function setStatus(message, type = 'error') {
+    function setStatus(message) {
         formStatus.textContent = message;
-        formStatus.className = `form-status ${type}`;
         formStatus.hidden = !message;
     }
 
     function clearStatus() {
-        formStatus.textContent = '';
-        formStatus.hidden = true;
-        formStatus.className = 'form-status';
+        setStatus('');
     }
 
     function setFieldError(name, message) {
@@ -1204,8 +1193,7 @@ footer p {
             email: fields.email.value.trim(),
             type: fields.type.value,
             message: fields.message.value.trim(),
-            submittedAt: new Date().toISOString(),
-            page: 'feedback.html'
+            submittedAt: new Date().toISOString()
         };
     }
 
@@ -1221,9 +1209,7 @@ footer p {
     function saveLocally(payload) {
         const record = {
             ...payload,
-            reference: makeReference(),
-            storage: 'local',
-            savedAt: new Date().toISOString()
+            reference: makeReference()
         };
 
         try {
@@ -1237,8 +1223,7 @@ footer p {
 
         return {
             reference: record.reference,
-            submittedAt: record.submittedAt,
-            storage: 'This browser'
+            submittedAt: record.submittedAt
         };
     }
 
@@ -1269,7 +1254,10 @@ footer p {
             throw new Error(data.error || 'The feedback server could not save your message.');
         }
 
-        return data;
+        return {
+            reference: data.reference,
+            submittedAt: data.submittedAt
+        };
     }
 
     function setLoading(loading) {

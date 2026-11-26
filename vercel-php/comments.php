@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 header('Content-Type: application/json; charset=utf-8');
@@ -272,7 +271,6 @@ $record = [
     'user' => $name,
     'text' => $text,
     'at' => $at,
-    'source' => 'vercel-comments',
 ];
 
 if (!store_comment($track, $record)) {
