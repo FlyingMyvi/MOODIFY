@@ -41,7 +41,6 @@
       overflow: hidden;
     }
 
-    /* ================= SITE HEADER ================= */
     .site-header {
       grid-area: header;
       background: rgba(9, 9, 12, 0.96);
@@ -82,7 +81,6 @@
       color: var(--accent-pop);
     }
 
-    /* ================= LEFT SIDEBAR ================= */
     .sidebar {
       grid-area: sidebar;
       background-color: var(--bg-panel);
@@ -244,7 +242,6 @@
       height: 42px;
     }
 
-    /* ================= MAIN VIEW ================= */
     .main-view {
       grid-area: main;
       background-color: var(--bg-black);
@@ -475,7 +472,6 @@
     .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
     .card p { font-size: 11px; color: var(--text-secondary); }
 
-    /* ================= GENIUS CHARTS + FEEDBACK ================= */
     .genius-split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; margin-top: 10px; }
     .genius-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 16px; }
     .genius-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
@@ -502,7 +498,6 @@
     .feedback-input:focus { border-color: var(--accent-pop); }
     .feedback-btn { background: var(--accent-pop); color: var(--text-on-accent); border: none; border-radius: 8px; padding: 0 12px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-    /* ================= LIVE LYRICS VIEW ================= */
     .lyrics-container {
       display: none;
       background: linear-gradient(160deg, rgba(204, 204, 255, 0.16), #08080C 65%);
@@ -521,7 +516,6 @@
     .lyric-offset button:disabled { opacity: .4; cursor: not-allowed; }
     #lyricOffsetLabel { font-size: 11px; color: var(--text-secondary); min-width: 72px; text-align: center; }
 
-    /* ================= RIGHT QUEUE PANEL ================= */
     .apple-queue-panel {
       grid-area: queue;
       background-color: var(--bg-panel);
@@ -550,7 +544,6 @@
     .queue-text h5 { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .queue-text span { font-size: 10px; color: var(--text-secondary); }
 
-    /* ================= FLOATING PLAYER DOCK ================= */
     .apple-player-dock {
       position: fixed;
       bottom: 16px;
@@ -686,7 +679,6 @@
     </div>
   </aside>
 
-  <!-- CENTER VIEW -->
   <main class="main-view">
     <div class="topbar">
       <div class="mode-switcher">
@@ -696,7 +688,6 @@
       <input type="text" id="searchInput" class="search-box" placeholder="Search Pop, K-Pop, R&B, Hip-Hop..." oninput="window.filterTracks()" />
     </div>
 
-    <!-- VIEW 1: HOME -->
     <div id="homeView">
       <div class="futuristic-hero">
         <div>
@@ -742,7 +733,6 @@
       </div>
     </div>
 
-    <!-- VIEW 2: LIVE LYRICS -->
     <div id="lyricsView" class="lyrics-container">
       <div class="lyrics-header">
         <div>
@@ -783,7 +773,6 @@
     </footer>
   </main>
 
-  <!-- RIGHT QUEUE PANEL -->
   <aside class="apple-queue-panel">
     <div class="queue-header">
       <h3>Playing Next</h3>
@@ -810,7 +799,6 @@
 
   <div id="playerNotice" class="player-notice"></div>
 
-  <!-- FLOATING PLAYER DOCK -->
   <div class="apple-player-dock">
     <div class="apple-controls">
       <button class="am-btn" onclick="window.prevTrack()" title="Previous">⏮</button>
@@ -839,13 +827,11 @@
     </div>
   </div>
 
-  <!-- ELEMEN AUDIO HTML5 SEBENAR -->
   <audio id="realAudioPlayer" preload="metadata"></audio>
 
   <script src="lyrics-timed.js?v=3"></script>
 
   <script type="module">
-    // Cuba import lyrics.js kalau wujud, kalau ada ralat sintaks dalam lyrics.js dia guna fallback supaya player tak rosak
     let songLyricsDatabase = {};
     try {
       await import('./lyrics.js');
@@ -854,7 +840,6 @@
       console.warn("Amaran: Fail lyrics.js ada ralat sintaks (cth: baris tak ada tanda petik). Sila pastikan setiap baris lirik ada tanda petik \"...\".", err);
     }
 
-    // Terima data lagu dari PHP
     const tracks = [
     {
         "id":  0,
@@ -1240,7 +1225,6 @@
     let currentTrackIndex = 0;
     let isPlaying = false;
 
-    // Synced lyrics state
     let currentTimedLyrics = null;
     let currentTimedMode = false;
     let lyricOffset = 0;
@@ -1274,7 +1258,6 @@
       noticeTimer = setTimeout(() => el.classList.remove('show'), 3500);
     }
 
-    // Event Listeners untuk HTML5 Audio sebenar
     audio.addEventListener('loadedmetadata', () => {
       document.getElementById('totalTime').textContent = formatTime(audio.duration);
       document.getElementById('progressBar').max = Math.floor(audio.duration);
@@ -1406,7 +1389,6 @@
       }
 
       currentTrackIndex = id;
-      // Guna encodeURIComponent supaya simbol seperti apostrof dalam solet'slove.mp3 dibaca dengan selamat
       audio.src = encodeURI(t.file);
       updatePlayerDockMeta();
       updateGeniusSection();
@@ -1920,7 +1902,6 @@
         return;
       }
 
-      // Fallback: older plain lyrics without timestamps
       const songData = songLyricsDatabase[currentTrackIndex];
       lyricOffset = 0;
       updateLyricOffsetLabel();

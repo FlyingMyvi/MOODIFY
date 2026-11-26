@@ -1,9 +1,6 @@
-// lyrics.js - WAJIB nama file ni lyrics.js, duduk sebelah moodify.html
-// Format ni yang moodify.html aku bagi tadi pakai
 
 window.songLyricsDatabase = {
 	
-  // POP
   0: { title: "As It Was", artist: "Harry Styles", lines: `
 [ "Holdin' me back
 Gravity's holdin' me back
@@ -347,7 +344,6 @@ with my heart
 with my heart ] 
 `.trim().split("\n") },
 
-  // K-POP
   5: { title: "The First Snow", artist: "EXO", lines: `
 [ On this afternoon as the first snow is falling
 If only I could call you, I’d be so happy
@@ -708,7 +704,6 @@ Now wait a minute, wait a minute
 Give give me your love to me ] 
 `.trim().split("\n") },
 
-  // R&B
   10: { title: "Like I Want You", artist: "Giveon", lines: `
 [ Sometimes I wish you knew
 But I disguise the truth
@@ -976,7 +971,6 @@ Only one holdin' me down (Ooh, only one)
 'Cause you the only one that's holdin' me down ] 
 `.trim().split("\n") },
 
-  // HIP HOP
   15: { title: "Ingat", artist: "Alyph", lines: `
  [ Kau kata kau nampak aku tengok dari jauh kau rasa terganggu
 Aku kata aku tak berani mengejar apa yang aku mahu

@@ -1,10 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * MOODIFY track comments endpoint for Vercel.
- * Each comment is stored as a private Vercel Blob.
- */
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 

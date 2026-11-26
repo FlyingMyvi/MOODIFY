@@ -1,4 +1,3 @@
-// Timed lyrics generated from LRCLIB synced lyrics
 window.timedLyrics = {
     "0":  {
               "title":  "As It Was",

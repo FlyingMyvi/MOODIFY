@@ -1,11 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * MOODIFY feedback endpoint
- * Stores submissions in ../feedback-data/feedback.json (outside the public site).
- * Used by feedback.html when the site is served by PHP (WAMP or php -S).
- */
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
